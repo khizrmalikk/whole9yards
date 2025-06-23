@@ -1,8 +1,13 @@
 "use client";
 import { useState, useEffect } from "react";
 import { motion } from "motion/react";
-import { IconPlus, IconEdit, IconTrash, IconEye, IconEyeOff, IconUpload, IconX } from "@tabler/icons-react";
+import { IconPlus, IconEdit, IconTrash, IconEye, IconEyeOff, IconUpload, IconX, IconHome } from "@tabler/icons-react";
 import { DatabaseService } from "@/lib/database";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 
 interface Project {
   id: string;
@@ -27,6 +32,7 @@ export default function PortfolioManager() {
   const [isAddingProject, setIsAddingProject] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [clickedProjectId, setClickedProjectId] = useState<string | null>(null);
   const [formData, setFormData] = useState<Partial<Project>>({
     title: "",
     description: "",
@@ -269,65 +275,93 @@ export default function PortfolioManager() {
     });
   };
 
+  const handleProjectClick = (projectId: string) => {
+    setClickedProjectId(projectId);
+    // Wait for animation to complete before navigating
+    setTimeout(() => {
+      window.location.href = `/portfolio/${projectId}`;
+    }, 300);
+  };
+
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white p-8 rounded-lg shadow-xl max-w-md w-full mx-4"
+          className="max-w-md w-full mx-4"
         >
-          <h1 className="text-2xl font-bold mb-6 text-center">Portfolio Manager</h1>
-          <div className="space-y-4">
-            <div className="relative">
-              <input
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter password"
-                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                onKeyPress={(e) => e.key === "Enter" && handleLogin()}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-3 text-gray-500 hover:text-gray-700"
-              >
-                {showPassword ? <IconEyeOff size={20} /> : <IconEye size={20} />}
-              </button>
-            </div>
-            <button
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl text-center">Portfolio Manager</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Enter password"
+                    onKeyPress={(e) => e.key === "Enter" && handleLogin()}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-0 top-0 h-full cursor-pointer"
+                  >
+                    {showPassword ? <IconEyeOff size={20} /> : <IconEye size={20} />}
+                  </Button>
+                </div>
+              </div>
+                          <Button
               onClick={handleLogin}
-              className="w-full bg-black text-white p-3 rounded-md hover:bg-gray-800 transition-colors"
+              className="w-full cursor-pointer"
+              size="lg"
             >
-              Login
-            </button>
-          </div>
+                Login
+              </Button>
+            </CardContent>
+          </Card>
         </motion.div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-black p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold">Portfolio Manager</h1>
+          <div className="flex items-center space-x-4">
+            <Button asChild variant="secondary">
+              <Link href="/">
+                <IconHome size={20} />
+                Back to Home
+              </Link>
+            </Button>
+            <h1 className="text-3xl font-bold text-white">Portfolio Manager</h1>
+          </div>
           <div className="flex space-x-4">
-            <button
+            <Button
               onClick={() => setIsAddingProject(true)}
-              className="bg-black text-white px-4 py-2 rounded-md hover:bg-gray-800 transition-colors flex items-center space-x-2"
+              variant="default"
+              className="cursor-pointer"
             >
               <IconPlus size={20} />
-              <span>Add Project</span>
-            </button>
-            <button
+              Add Project
+            </Button>
+            <Button
               onClick={handleLogout}
-              className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors"
+              variant="destructive"
+              className="cursor-pointer"
             >
               Logout
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -337,48 +371,67 @@ export default function PortfolioManager() {
             <motion.div
               key={project.id}
               initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="bg-white rounded-lg shadow-md overflow-hidden"
+              animate={{ 
+                opacity: clickedProjectId === project.id ? 0 : 1, 
+                scale: clickedProjectId === project.id ? 0.9 : 1,
+                x: clickedProjectId === project.id ? -100 : 0
+              }}
+              transition={{ duration: 0.3 }}
             >
-              <div
-                className="h-48 bg-cover bg-center bg-gray-200"
-                style={{ 
-                  backgroundImage: project.thumbnail ? `url(${project.thumbnail})` : 'none'
-                }}
+              <Card 
+                className="overflow-hidden bg-gray-900 border-gray-800 cursor-pointer hover:bg-gray-800 transition-colors"
+                onClick={() => handleProjectClick(project.id)}
               >
-                {!project.thumbnail && (
-                  <div className="h-full flex items-center justify-center text-gray-500">
-                    No Image
-                  </div>
-                )}
-              </div>
-              <div className="p-4">
-                <h3 className="font-bold text-lg mb-2">{project.title}</h3>
-                <p className="text-gray-600 text-sm mb-2 line-clamp-2">{project.description}</p>
-                <div className="text-xs text-gray-500 space-y-1">
-                  <div>Category: {project.category}</div>
-                  <div>Type: {project.type}</div>
-                  <div>Size: {project.size}</div>
-                  <div>Location: {project.location}</div>
+                <div
+                  className="h-48 bg-cover bg-center bg-gray-200"
+                  style={{ 
+                    backgroundImage: project.thumbnail ? `url(${project.thumbnail})` : 'none'
+                  }}
+                >
+                  {!project.thumbnail && (
+                    <div className="h-full flex items-center justify-center text-gray-500">
+                      No Image
+                    </div>
+                  )}
                 </div>
-                <div className="flex justify-end space-x-2 mt-4">
-                  <button
-                    onClick={() => {
+                <CardHeader>
+                  <CardTitle className="text-white">{project.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-300 text-sm mb-4 line-clamp-2">{project.description}</p>
+                  <div className="text-xs text-gray-400 space-y-1">
+                    <div>Category: {project.category}</div>
+                    <div>Type: {project.type}</div>
+                    <div>Size: {project.size}</div>
+                    <div>Location: {project.location}</div>
+                  </div>
+                </CardContent>
+                <CardFooter className="justify-end space-x-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={(e) => {
+                      e.stopPropagation();
                       setEditingProject(project);
                       setFormData(project);
                     }}
-                    className="text-blue-600 hover:text-blue-800"
+                    className="text-white hover:text-gray-300 cursor-pointer"
                   >
                     <IconEdit size={18} />
-                  </button>
-                  <button
-                    onClick={() => handleDeleteProject(project.id)}
-                    className="text-red-600 hover:text-red-800"
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteProject(project.id);
+                    }}
+                    className="text-white hover:text-red-400 cursor-pointer"
                   >
                     <IconTrash size={18} />
-                  </button>
-                </div>
-              </div>
+                  </Button>
+                </CardFooter>
+              </Card>
             </motion.div>
           ))}
         </div>
@@ -389,40 +442,43 @@ export default function PortfolioManager() {
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+              className="bg-gray-900 border border-gray-800 rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
             >
-              <h2 className="text-2xl font-bold mb-6">
+              <h2 className="text-2xl font-bold mb-6 text-white">
                 {editingProject ? "Edit Project" : "Add New Project"}
               </h2>
               
               <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Title *</label>
-                  <input
+                <div className="space-y-2">
+                  <Label htmlFor="title" className="text-white">Title *</Label>
+                  <Input
+                    id="title"
                     type="text"
                     value={formData.title || ""}
                     onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-400"
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium mb-2">Description *</label>
+                <div className="space-y-2">
+                  <Label htmlFor="description" className="text-white">Description *</Label>
                   <textarea
+                    id="description"
                     value={formData.description || ""}
                     onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                     rows={3}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full p-3 border border-gray-700 bg-gray-800 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Category</label>
+                  <div className="space-y-2">
+                    <Label htmlFor="category" className="text-white">Category</Label>
                     <select
+                      id="category"
                       value={formData.category || "Residential"}
                       onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value as Project["category"] }))}
-                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full p-3 border border-gray-700 bg-gray-800 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       {CATEGORIES.map(cat => (
                         <option key={cat} value={cat}>{cat}</option>
@@ -430,53 +486,57 @@ export default function PortfolioManager() {
                     </select>
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Type</label>
-                    <input
+                  <div className="space-y-2">
+                    <Label htmlFor="type" className="text-white">Type</Label>
+                    <Input
+                      id="type"
                       type="text"
                       value={formData.type || ""}
                       onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value }))}
-                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-400"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Size</label>
-                    <input
+                  <div className="space-y-2">
+                    <Label htmlFor="size" className="text-white">Size</Label>
+                    <Input
+                      id="size"
                       type="text"
                       value={formData.size || ""}
                       onChange={(e) => setFormData(prev => ({ ...prev, size: e.target.value }))}
-                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-400"
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Location</label>
-                    <input
+                  <div className="space-y-2">
+                    <Label htmlFor="location" className="text-white">Location</Label>
+                    <Input
+                      id="location"
                       type="text"
                       value={formData.location || ""}
                       onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
-                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-400"
                     />
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium mb-2">Thumbnail Image</label>
+                <div className="space-y-2">
+                  <Label htmlFor="thumbnail" className="text-white">Thumbnail Image</Label>
                   <div className="space-y-2">
-                    <input
+                    <Input
+                      id="thumbnail"
                       type="file"
                       accept="image/*"
                       onChange={(e) => handleImageUpload(e, 'thumbnail')}
-                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       disabled={isUploading}
+                      className="bg-gray-800 border-gray-700 text-white file:text-white"
                     />
                     {isUploading && (
-                      <div className="flex items-center space-x-2 text-blue-600">
+                      <div className="flex items-center space-x-2 text-blue-400">
                         <IconUpload className="animate-spin" size={16} />
-                        <span className="text-sm">Uploading...</span>
+                        <span className="text-sm text-white">Uploading...</span>
                       </div>
                     )}
                     {formData.thumbnail && (
@@ -486,27 +546,30 @@ export default function PortfolioManager() {
                           alt="Thumbnail preview" 
                           className="h-20 w-20 object-cover rounded border"
                         />
-                        <button
+                        <Button
+                          variant="destructive"
+                          size="icon"
                           onClick={() => removeImage(0, 'thumbnail')}
-                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                          className="absolute -top-2 -right-2 h-6 w-6 cursor-pointer"
                         >
                           <IconX size={12} />
-                        </button>
+                        </Button>
                       </div>
                     )}
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium mb-2">Additional Pictures</label>
+                <div className="space-y-2">
+                  <Label htmlFor="pictures" className="text-white">Additional Pictures</Label>
                   <div className="space-y-2">
-                    <input
+                    <Input
+                      id="pictures"
                       type="file"
                       accept="image/*"
                       multiple
                       onChange={(e) => handleImageUpload(e, 'pictures')}
-                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       disabled={isUploading}
+                      className="bg-gray-800 border-gray-700 text-white file:text-white"
                     />
                     {formData.pictures && formData.pictures.length > 0 && (
                       <div className="flex flex-wrap gap-2">
@@ -517,12 +580,14 @@ export default function PortfolioManager() {
                               alt={`Picture ${index + 1}`} 
                               className="h-20 w-20 object-cover rounded border"
                             />
-                            <button
+                            <Button
+                              variant="destructive"
+                              size="icon"
                               onClick={() => removeImage(index, 'pictures')}
-                              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                              className="absolute -top-2 -right-2 h-6 w-6 cursor-pointer"
                             >
                               <IconX size={12} />
-                            </button>
+                            </Button>
                           </div>
                         ))}
                       </div>
@@ -531,25 +596,27 @@ export default function PortfolioManager() {
                 </div>
               </div>
 
-              <div className="flex justify-end space-x-4 mt-6">
-                <button
+              <div className="flex justify-end space-x-4 mt-6 text-white">
+                <Button
+                  variant="ghost"
                   onClick={() => {
                     setIsAddingProject(false);
                     setEditingProject(null);
                     resetForm();
                   }}
-                  className="px-4 py-2 text-gray-600 hover:text-gray-800"
                   disabled={isUploading}
+                  className="cursor-pointer"
                 >
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="default"
+                  className="bg-white text-black hover:bg-gray-200"
                   onClick={editingProject ? handleEditProject : handleAddProject}
-                  className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition-colors disabled:opacity-50"
                   disabled={isUploading}
                 >
                   {isUploading ? "Uploading..." : editingProject ? "Update" : "Add"} Project
-                </button>
+                </Button>
               </div>
             </motion.div>
           </div>

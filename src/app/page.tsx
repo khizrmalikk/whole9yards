@@ -423,9 +423,9 @@ export default function Home() {
           <NavbarLogo />
           <NavItems
             items={[
-              { name: "Home", link: "#" },
-              { name: "About", link: "#" },
-              { name: "Contact", link: "#" },
+              { name: "Home", link: "/" },
+              { name: "About", link: "/#about" },
+              { name: "Portfolio", link: "/#portfolio" },
             ]}
           />
           <NavbarButton href="#" variant="secondary">
@@ -467,7 +467,7 @@ export default function Home() {
       </section>
 
       {/* About Us Section */}
-      <section className="min-h-screen bg-black text-white py-20 px-8">
+      <section id="about" className="min-h-screen bg-black text-white py-20 px-8">
         <div className="max-w-4xl mx-auto">
           <motion.h2 
             className="text-4xl md:text-6xl font-bold mb-12 text-center tracking-tight"
@@ -529,7 +529,9 @@ export default function Home() {
       </section>
 
       {/* Projects Grid Section */}
-      <ProjectGrid items={projects} />
+      <section id="portfolio" className="min-h-screen bg-black text-white">
+        <ProjectGrid items={projects} />
+      </section>
 
       {/* Footer */}
       <footer className="bg-black text-white py-16 px-8 border-t border-white/10">
@@ -575,7 +577,7 @@ export default function Home() {
                     Portfolio
                   </a>
                 </li>
-                <li>
+                {/* <li>
                   <a href="#" className="text-white/80 hover:text-white transition-colors duration-200">
                     Services
                   </a>
@@ -584,7 +586,7 @@ export default function Home() {
                   <a href="#" className="text-white/80 hover:text-white transition-colors duration-200">
                     Contact
                   </a>
-                </li>
+                </li> */}
               </ul>
             </motion.div>
 
@@ -606,21 +608,21 @@ export default function Home() {
                 <div>
                   <p className="text-white/60 text-sm mb-1">Phone</p>
                   <a href="tel:+1234567890" className="text-white/80 hover:text-white transition-colors duration-200">
-                    +1 (234) 567-8900
+                    +971 (050) 156 2323 
                   </a>
                 </div>
                 <div>
                   <p className="text-white/60 text-sm mb-1">Follow Us</p>
                   <div className="flex space-x-4 mt-2">
-                    <a href="#" className="text-white/60 hover:text-white transition-colors duration-200">
+                    <a href="https://www.instagram.com/thewhole9yards.ae/" target="_blank" className="text-white/60 hover:text-white transition-colors duration-200">
                       Instagram
                     </a>
-                    <a href="#" className="text-white/60 hover:text-white transition-colors duration-200">
+                    {/* <a href="#" className="text-white/60 hover:text-white transition-colors duration-200">
                       LinkedIn
                     </a>
                     <a href="#" className="text-white/60 hover:text-white transition-colors duration-200">
                       Pinterest
-                    </a>
+                    </a> */}
                   </div>
                 </div>
               </div>
