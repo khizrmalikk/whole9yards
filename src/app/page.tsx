@@ -504,7 +504,7 @@ export default function Home() {
               transition={{ duration: 0.6, delay: 0.6 }}
               viewport={{ once: true }}
             >
-              We use many different kinds of materials paired with muted and desaturated colours to create an organic space that feels calm. Sana's designs are eclectic and characterful, preferring to follow the flow of the space and be guided by her client's personal taste. The company leans towards using textiles and buying furniture that is built to last, as well as reupholstering existing furniture, sourcing out products unique to the needs of each specific project.
+              We use many different kinds of materials paired with muted and desaturated colours to create an organic space that feels calm. Sana&apos;s designs are eclectic and characterful, preferring to follow the flow of the space and be guided by her client&apos;s personal taste. The company leans towards using textiles and buying furniture that is built to last, as well as reupholstering existing furniture, sourcing out products unique to the needs of each specific project.
             </motion.p>
             
             <motion.p
@@ -522,7 +522,7 @@ export default function Home() {
               transition={{ duration: 0.6, delay: 1.0 }}
               viewport={{ once: true }}
             >
-              Sana's experience in the industry has given her the opportunity to build relationships with specialist suppliers that offer high end craft, from sourcing anything from materials to bespoke joinery and upholstery.
+              Sana&apos;s experience in the industry has given her the opportunity to build relationships with specialist suppliers that offer high end craft, from sourcing anything from materials to bespoke joinery and upholstery.
             </motion.p>
           </div>
         </div>
