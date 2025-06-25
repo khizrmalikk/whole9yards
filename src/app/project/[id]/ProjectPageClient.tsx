@@ -4,12 +4,42 @@ import { motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import { Project } from "@/types/project";
 import { Navbar, NavBody, NavItems, NavbarLogo, NavbarButton } from "@/components/ui/resizable-navbar";
+import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 
 export function ProjectPageClient({ projectId }: { projectId: string }) {
   const [project, setProject] = useState<Project | null>(null);
   const [isReady, setIsReady] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isAutoScrolling, setIsAutoScrolling] = useState(true);
   const router = useRouter();
+
+  const nextImage = () => {
+    if (project && project.pictures.length > 1) {
+      setCurrentImageIndex((prev) => (prev + 1) % project.pictures.length);
+      // Pause auto-scroll when user manually navigates
+      setIsAutoScrolling(false);
+      // Resume auto-scroll after 5 seconds
+      setTimeout(() => setIsAutoScrolling(true), 5000);
+    }
+  };
+
+  const prevImage = () => {
+    if (project && project.pictures.length > 1) {
+      setCurrentImageIndex((prev) => (prev - 1 + project.pictures.length) % project.pictures.length);
+      // Pause auto-scroll when user manually navigates
+      setIsAutoScrolling(false);
+      // Resume auto-scroll after 5 seconds
+      setTimeout(() => setIsAutoScrolling(true), 5000);
+    }
+  };
+
+  const goToImage = (index: number) => {
+    setCurrentImageIndex(index);
+    // Pause auto-scroll when user manually navigates
+    setIsAutoScrolling(false);
+    // Resume auto-scroll after 5 seconds
+    setTimeout(() => setIsAutoScrolling(true), 5000);
+  };
 
   useEffect(() => {
     const loadProject = async () => {
@@ -130,6 +160,17 @@ export function ProjectPageClient({ projectId }: { projectId: string }) {
 
     loadProject();
   }, [projectId]);
+
+  // Auto-scroll effect
+  useEffect(() => {
+    if (!project || !isAutoScrolling || project.pictures.length <= 1) return;
+
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % project.pictures.length);
+    }, 4000); // Change image every 4 seconds
+
+    return () => clearInterval(interval);
+  }, [project, isAutoScrolling]);
 
   // Don't render anything until data is ready
   if (!isReady) {
@@ -262,49 +303,81 @@ export function ProjectPageClient({ projectId }: { projectId: string }) {
             Project Gallery
           </motion.h2>
 
-          {/* Main Image Display */}
+          {/* Main Image Display with Navigation */}
           <motion.div
-            className="mb-8"
+            className="relative mb-8 group"
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
+            onMouseEnter={() => setIsAutoScrolling(false)}
+            onMouseLeave={() => setIsAutoScrolling(true)}
           >
             <img
               src={project.pictures[currentImageIndex] || project.thumbnail}
               alt={`${project.title} - Image ${currentImageIndex + 1}`}
               className="w-full h-[70vh] object-cover rounded-lg"
             />
+            
+            {/* Navigation Arrows */}
+            {project.pictures.length > 1 && (
+              <>
+                {/* Left Arrow */}
+                <button
+                  onClick={prevImage}
+                  className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all duration-300 backdrop-blur-sm z-10"
+                  aria-label="Previous image"
+                >
+                  <IconChevronLeft size={24} />
+                </button>
+                
+                {/* Right Arrow */}
+                <button
+                  onClick={nextImage}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all duration-300 backdrop-blur-sm z-10"
+                  aria-label="Next image"
+                >
+                  <IconChevronRight size={24} />
+                </button>
+              </>
+            )}
+
+            {/* Image Counter and Auto-scroll Indicator */}
+            {project.pictures.length > 1 && (
+              <div className="absolute bottom-4 right-4 flex items-center space-x-2">
+                <div className="bg-black/50 text-white px-3 py-1 rounded-full text-sm backdrop-blur-sm">
+                  {currentImageIndex + 1} / {project.pictures.length}
+                </div>
+                {isAutoScrolling && (
+                  <div className="bg-black/50 text-white px-2 py-1 rounded-full text-xs backdrop-blur-sm flex items-center space-x-1">
+                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                    <span>Auto</span>
+                  </div>
+                )}
+              </div>
+            )}
           </motion.div>
 
-          {/* Thumbnail Navigation */}
+          {/* Image Dots Indicator */}
           {project.pictures.length > 1 && (
             <motion.div
-              className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4"
-              initial={{ opacity: 0, y: 30 }}
+              className="flex justify-center space-x-2"
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
               viewport={{ once: true }}
             >
-              {project.pictures.map((image, index) => (
+              {project.pictures.map((_, index) => (
                 <button
                   key={index}
-                  onClick={() => setCurrentImageIndex(index)}
-                  className={`relative aspect-square overflow-hidden rounded-lg transition-all duration-300 ${
+                  onClick={() => goToImage(index)}
+                  className={`w-3 h-3 rounded-full transition-all duration-300 ${
                     currentImageIndex === index 
-                      ? 'ring-2 ring-white scale-105' 
-                      : 'hover:scale-105 hover:ring-1 hover:ring-white/50'
+                      ? 'bg-white scale-125' 
+                      : 'bg-white/50 hover:bg-white/70'
                   }`}
-                >
-                  <img
-                    src={image}
-                    alt={`${project.title} thumbnail ${index + 1}`}
-                    className="w-full h-full object-cover"
-                  />
-                  {currentImageIndex !== index && (
-                    <div className="absolute inset-0 bg-black/30" />
-                  )}
-                </button>
+                  aria-label={`Go to image ${index + 1}`}
+                />
               ))}
             </motion.div>
           )}

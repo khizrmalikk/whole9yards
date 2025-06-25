@@ -1,5 +1,11 @@
 "use client";
-import { Navbar, NavBody, NavItems, NavbarLogo, NavbarButton } from "@/components/ui/resizable-navbar";
+import {
+  Navbar,
+  NavBody,
+  NavItems,
+  NavbarLogo,
+  NavbarButton,
+} from "@/components/ui/resizable-navbar";
 import { motion, useInView } from "motion/react";
 import { useState, useEffect, useRef } from "react";
 import { Project } from "@/types/project";
@@ -7,74 +13,77 @@ import Link from "next/link";
 
 // Fallback data for when no projects exist
 const fallbackData: Project[] = [
-  { 
-    id: "1", 
+  {
+    id: "1",
     thumbnail: "/bgs/UC_06048.JPG",
-    title: "Modern Office Space", 
-    description: "A stunning modern office space in the heart of the city featuring contemporary design elements, open layouts, and premium finishes. This project showcases our ability to create functional yet beautiful commercial spaces that inspire productivity and creativity. The design incorporates natural light, sustainable materials, and flexible workspaces that adapt to the evolving needs of modern businesses.",
-    category: "Commercial", 
-    type: "Office", 
-    size: "2,500 sq ft", 
+    title: "Modern Office Space",
+    description:
+      "A stunning modern office space in the heart of the city featuring contemporary design elements, open layouts, and premium finishes. This project showcases our ability to create functional yet beautiful commercial spaces that inspire productivity and creativity. The design incorporates natural light, sustainable materials, and flexible workspaces that adapt to the evolving needs of modern businesses.",
+    category: "Commercial",
+    type: "Office",
+    size: "2,500 sq ft",
     location: "Downtown Manhattan",
     pictures: ["/bgs/UC_06048.JPG", "/bgs/UC_06123.JPG", "/bgs/UC_05990.JPG"],
     createdAt: new Date(),
   },
-  { 
-    id: "2", 
+  {
+    id: "2",
     thumbnail: "/bgs/UC_06048.JPG",
-    title: "Luxury Apartment", 
-    description: "Elegant luxury apartment with breathtaking city views, featuring high-end materials, custom furnishings, and a sophisticated color palette that creates a serene living environment. Every detail has been carefully considered to create a harmonious balance between comfort and style, from the custom millwork to the curated art collection.",
-    category: "Residential", 
-    type: "Apartment", 
-    size: "1,200 sq ft", 
+    title: "Luxury Apartment",
+    description:
+      "Elegant luxury apartment with breathtaking city views, featuring high-end materials, custom furnishings, and a sophisticated color palette that creates a serene living environment. Every detail has been carefully considered to create a harmonious balance between comfort and style, from the custom millwork to the curated art collection.",
+    category: "Residential",
+    type: "Apartment",
+    size: "1,200 sq ft",
     location: "Brooklyn Heights",
     pictures: ["/bgs/UC_06048.JPG", "/bgs/UC_05990.JPG"],
     createdAt: new Date(),
   },
-  { 
-    id: "3", 
+  {
+    id: "3",
     thumbnail: "/bgs/UC_06123.JPG",
-    title: "Retail Storefront", 
-    description: "Prime retail location with high foot traffic, designed to maximize customer engagement through strategic layout, lighting, and visual merchandising elements. The space combines modern aesthetics with practical functionality, creating an inviting atmosphere that encourages exploration and enhances the shopping experience.",
-    category: "Commercial", 
-    type: "Retail", 
-    size: "800 sq ft", 
+    title: "Retail Storefront",
+    description:
+      "Prime retail location with high foot traffic, designed to maximize customer engagement through strategic layout, lighting, and visual merchandising elements. The space combines modern aesthetics with practical functionality, creating an inviting atmosphere that encourages exploration and enhances the shopping experience.",
+    category: "Commercial",
+    type: "Retail",
+    size: "800 sq ft",
     location: "SoHo District",
     pictures: ["/bgs/UC_06123.JPG", "/bgs/UC_06048.JPG"],
     createdAt: new Date(),
   },
-  // { 
-  //   id: "4", 
+  // {
+  //   id: "4",
   //   thumbnail: "/bgs/UC_05990.JPG",
-  //   title: "Co-working Space", 
+  //   title: "Co-working Space",
   //   description: "Modern co-working space designed for productivity and collaboration, featuring flexible layouts, natural lighting, and sustainable materials throughout. The design promotes community interaction while providing quiet zones for focused work, incorporating biophilic design elements that enhance well-being and creativity.",
-  //   category: "Commercial", 
-  //   type: "Office", 
-  //   size: "5,000 sq ft", 
+  //   category: "Commercial",
+  //   type: "Office",
+  //   size: "5,000 sq ft",
   //   location: "Midtown West",
   //   pictures: ["/bgs/UC_05990.JPG", "/bgs/UC_06123.JPG", "/bgs/UC_06048.JPG"],
   //   createdAt: new Date(),
   // },
-  // { 
-  //   id: "5", 
+  // {
+  //   id: "5",
   //   thumbnail: "/bgs/UC_06048.JPG",
-  //   title: "Penthouse Suite", 
+  //   title: "Penthouse Suite",
   //   description: "Luxurious penthouse with panoramic city views, featuring custom millwork, premium appliances, and carefully curated art pieces that reflect the client's personal style. The design seamlessly blends indoor and outdoor living spaces, creating a sophisticated urban retreat that maximizes natural light and architectural details.",
-  //   category: "Residential", 
-  //   type: "Penthouse", 
-  //   size: "3,200 sq ft", 
+  //   category: "Residential",
+  //   type: "Penthouse",
+  //   size: "3,200 sq ft",
   //   location: "Upper East Side",
   //   pictures: ["/bgs/UC_06048.JPG", "/bgs/UC_05990.JPG", "/bgs/UC_06123.JPG"],
   //   createdAt: new Date(),
   // },
-  // { 
-  //   id: "6", 
+  // {
+  //   id: "6",
   //   thumbnail: "/bgs/UC_06123.JPG",
-  //   title: "Creative Studio", 
+  //   title: "Creative Studio",
   //   description: "Inspiring creative studio space for artists and designers, featuring flexible work areas, abundant natural light, and industrial elements balanced with warm, organic materials. The design supports various creative processes while maintaining an atmosphere that stimulates innovation and artistic expression.",
-  //   category: "Commercial", 
-  //   type: "Studio", 
-  //   size: "1,800 sq ft", 
+  //   category: "Commercial",
+  //   type: "Studio",
+  //   size: "1,800 sq ft",
   //   location: "Williamsburg",
   //   pictures: ["/bgs/UC_06123.JPG", "/bgs/UC_06048.JPG", "/bgs/UC_05990.JPG"],
   //   createdAt: new Date(),
@@ -89,93 +98,113 @@ interface CardProps {
 
 const Card = ({ data, index, isFullWidth }: CardProps) => {
   const ref = useRef(null);
-  const isInView = useInView(ref, { 
-    once: true, 
-    margin: "-100px 0px -100px 0px" // Trigger animation when card is 100px from viewport
+  const isInView = useInView(ref, {
+    once: true,
+    margin: "-100px 0px -100px 0px", // Trigger animation when card is 100px from viewport
   });
 
   return (
-    <Link href={`/project/${data.id}`} className="block" style={{ gridColumn: isFullWidth ? 'span 2' : 'span 1' }}>
+    <Link
+      href={`/project/${data.id}`}
+      className="block"
+      style={{ gridColumn: isFullWidth ? "span 2" : "span 1" }}
+    >
       <motion.div
         ref={ref}
         initial={{ opacity: 0, y: 100, scale: 0.9 }}
-        animate={isInView ? { 
-          opacity: 1, 
-          y: 0, 
-          scale: 1 
-        } : { 
-          opacity: 0, 
-          y: 100, 
-          scale: 0.9 
-        }}
-        transition={{ 
-          duration: 0.8, 
+        animate={
+          isInView
+            ? {
+                opacity: 1,
+                y: 0,
+                scale: 1,
+              }
+            : {
+                opacity: 0,
+                y: 100,
+                scale: 0.9,
+              }
+        }
+        transition={{
+          duration: 0.8,
           delay: index * 0.1, // Stagger animation based on card index
-          ease: "easeOut" 
+          ease: "easeOut",
         }}
         className={`relative overflow-hidden h-screen bg-cover bg-center cursor-pointer group`}
-        style={{ 
-          backgroundImage: `url('${data.thumbnail}')`
+        style={{
+          backgroundImage: `url('${data.thumbnail}')`,
         }}
       >
         {/* Dark overlay for better text visibility */}
-        <motion.div 
-          className="absolute inset-0 bg-black/40 group-hover:bg-black/60 transition-colors duration-300" 
+        <motion.div
+          className="absolute inset-0 bg-black/40 group-hover:bg-black/60 transition-colors duration-300"
           initial={{ opacity: 0 }}
           animate={isInView ? { opacity: 1 } : { opacity: 0 }}
           transition={{ duration: 0.6, delay: index * 0.1 + 0.2 }}
         />
-        
+
         {/* Hover overlay */}
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
-        
+
         {/* Content positioned at bottom left */}
-        <motion.div 
+        <motion.div
           className="absolute bottom-8 left-8 text-white group-hover:transform group-hover:translate-y-[-8px] transition-transform duration-300"
           initial={{ opacity: 0, x: -50 }}
-          animate={isInView ? { 
-            opacity: 1, 
-            x: 0 
-          } : { 
-            opacity: 0, 
-            x: -50 
-          }}
-          transition={{ 
-            duration: 0.8, 
+          animate={
+            isInView
+              ? {
+                  opacity: 1,
+                  x: 0,
+                }
+              : {
+                  opacity: 0,
+                  x: -50,
+                }
+          }
+          transition={{
+            duration: 0.8,
             delay: index * 0.1 + 0.4,
-            ease: "easeOut" 
+            ease: "easeOut",
           }}
         >
-          <motion.h3 
+          <motion.h3
             className="text-5xl font-bold mb-4 tracking-tight"
             initial={{ opacity: 0, y: 30 }}
-            animate={isInView ? { 
-              opacity: 1, 
-              y: 0 
-            } : { 
-              opacity: 0, 
-              y: 30 
-            }}
-            transition={{ 
-              duration: 0.6, 
-              delay: index * 0.1 + 0.6 
+            animate={
+              isInView
+                ? {
+                    opacity: 1,
+                    y: 0,
+                  }
+                : {
+                    opacity: 0,
+                    y: 30,
+                  }
+            }
+            transition={{
+              duration: 0.6,
+              delay: index * 0.1 + 0.6,
             }}
           >
             {data.title}
           </motion.h3>
-          <motion.div 
+          <motion.div
             className="space-y-2 text-sm font-[400] tracking-wide"
             initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { 
-              opacity: 1, 
-              y: 0 
-            } : { 
-              opacity: 0, 
-              y: 20 
-            }}
-            transition={{ 
-              duration: 0.6, 
-              delay: index * 0.1 + 0.8 
+            animate={
+              isInView
+                ? {
+                    opacity: 1,
+                    y: 0,
+                  }
+                : {
+                    opacity: 0,
+                    y: 20,
+                  }
+            }
+            transition={{
+              duration: 0.6,
+              delay: index * 0.1 + 0.8,
             }}
           >
             <div className="flex items-center space-x-4">
@@ -195,14 +224,16 @@ const Card = ({ data, index, isFullWidth }: CardProps) => {
               <span>{data.location}</span>
             </div>
           </motion.div>
-          
+
           {/* Click indicator */}
           <motion.div
             className="mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
             initial={{ opacity: 0 }}
             animate={isInView ? { opacity: 0 } : { opacity: 0 }}
           >
-            <span className="text-white/60 text-sm">Click to view project →</span>
+            <span className="text-white/60 text-sm">
+              Click to view project →
+            </span>
           </motion.div>
         </motion.div>
       </motion.div>
@@ -211,47 +242,47 @@ const Card = ({ data, index, isFullWidth }: CardProps) => {
 };
 
 const ProjectGrid = ({ items }: { items: Project[] }) => {
-  const renderCards = () => {
+  const renderDesktopCards = () => {
     const cards = [];
     let index = 0;
     let cardIndex = 0; // For animation staggering
-    
+
     while (index < items.length) {
       const remaining = items.length - index;
-      
+
       if (remaining >= 3 && remaining % 3 === 0) {
         // Multiple of 3: Big card + 2 half cards pattern
         const groupsOf3 = Math.floor(remaining / 3);
-        
+
         for (let group = 0; group < groupsOf3; group++) {
           // Full width card
           cards.push(
-            <Card 
-              key={items[index].id} 
-              data={items[index]} 
-              isFullWidth={true} 
+            <Card
+              key={items[index].id}
+              data={items[index]}
+              isFullWidth={true}
               index={cardIndex}
             />
           );
           index++;
           cardIndex++;
-          
+
           // Two half cards
           cards.push(
-            <Card 
-              key={items[index].id} 
-              data={items[index]} 
-              isFullWidth={false} 
+            <Card
+              key={items[index].id}
+              data={items[index]}
+              isFullWidth={false}
               index={cardIndex}
             />
           );
           index++;
           cardIndex++;
           cards.push(
-            <Card 
-              key={items[index].id} 
-              data={items[index]} 
-              isFullWidth={false} 
+            <Card
+              key={items[index].id}
+              data={items[index]}
+              isFullWidth={false}
               index={cardIndex}
             />
           );
@@ -261,20 +292,20 @@ const ProjectGrid = ({ items }: { items: Project[] }) => {
       } else if (remaining === 2) {
         // Exactly 2 remaining: pair of half cards
         cards.push(
-          <Card 
-            key={items[index].id} 
-            data={items[index]} 
-            isFullWidth={false} 
+          <Card
+            key={items[index].id}
+            data={items[index]}
+            isFullWidth={false}
             index={cardIndex}
           />
         );
         index++;
         cardIndex++;
         cards.push(
-          <Card 
-            key={items[index].id} 
-            data={items[index]} 
-            isFullWidth={false} 
+          <Card
+            key={items[index].id}
+            data={items[index]}
+            isFullWidth={false}
             index={cardIndex}
           />
         );
@@ -285,20 +316,20 @@ const ProjectGrid = ({ items }: { items: Project[] }) => {
         const pairsToCreate = Math.min(2, remaining / 2); // Create max 2 pairs at a time
         for (let pair = 0; pair < pairsToCreate; pair++) {
           cards.push(
-            <Card 
-              key={items[index].id} 
-              data={items[index]} 
-              isFullWidth={false} 
+            <Card
+              key={items[index].id}
+              data={items[index]}
+              isFullWidth={false}
               index={cardIndex}
             />
           );
           index++;
           cardIndex++;
           cards.push(
-            <Card 
-              key={items[index].id} 
-              data={items[index]} 
-              isFullWidth={false} 
+            <Card
+              key={items[index].id}
+              data={items[index]}
+              isFullWidth={false}
               index={cardIndex}
             />
           );
@@ -308,23 +339,23 @@ const ProjectGrid = ({ items }: { items: Project[] }) => {
       } else {
         // Odd number or single item: one full card then pairs
         cards.push(
-          <Card 
-            key={items[index].id} 
-            data={items[index]} 
-            isFullWidth={true} 
+          <Card
+            key={items[index].id}
+            data={items[index]}
+            isFullWidth={true}
             index={cardIndex}
           />
         );
         index++;
         cardIndex++;
-        
+
         // Rest as pairs
         while (index < items.length) {
           cards.push(
-            <Card 
-              key={items[index].id} 
-              data={items[index]} 
-              isFullWidth={false} 
+            <Card
+              key={items[index].id}
+              data={items[index]}
+              isFullWidth={false}
               index={cardIndex}
             />
           );
@@ -332,10 +363,10 @@ const ProjectGrid = ({ items }: { items: Project[] }) => {
           cardIndex++;
           if (index < items.length) {
             cards.push(
-              <Card 
-                key={items[index].id} 
-                data={items[index]} 
-                isFullWidth={false} 
+              <Card
+                key={items[index].id}
+                data={items[index]}
+                isFullWidth={false}
                 index={cardIndex}
               />
             );
@@ -345,14 +376,33 @@ const ProjectGrid = ({ items }: { items: Project[] }) => {
         }
       }
     }
-    
+
     return cards;
   };
 
+  const renderMobileCards = () => {
+    return items.map((item, index) => (
+      <Card
+        key={item.id}
+        data={item}
+        isFullWidth={true}
+        index={index}
+      />
+    ));
+  };
+
   return (
-    <div className="grid grid-cols-2 w-full">
-      {renderCards()}
-    </div>
+    <>
+      {/* Desktop Grid */}
+      <div className="hidden md:grid grid-cols-2 w-full">
+        {renderDesktopCards()}
+      </div>
+      
+      {/* Mobile Grid - One card per row */}
+      <div className="md:hidden grid grid-cols-1 w-full">
+        {renderMobileCards()}
+      </div>
+    </>
   );
 };
 
@@ -370,7 +420,7 @@ export default function Home() {
     const loadProjects = async () => {
       try {
         // Try to fetch from API first
-        const response = await fetch('/api/projects');
+        const response = await fetch("/api/projects");
         if (response.ok) {
           const apiProjects = await response.json();
           if (apiProjects.length > 0) {
@@ -406,15 +456,15 @@ export default function Home() {
   }, []);
 
   return (
-    <motion.div 
+    <motion.div
       className="min-h-screen"
       initial={{ x: 0 }}
       animate={{ x: 0 }}
       exit={{ x: "-100%" }}
-      transition={{ 
-        type: "tween", 
-        ease: "easeInOut", 
-        duration: 0.6 
+      transition={{
+        type: "tween",
+        ease: "easeInOut",
+        duration: 0.6,
       }}
     >
       {/* Navbar without motion wrapper to preserve scroll animation */}
@@ -436,94 +486,204 @@ export default function Home() {
 
       <section className="flex flex-col items-center justify-center h-screen overflow-hidden">
         {/* Background image with zoom animation */}
-        <motion.div 
+        <motion.div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: "url('/bgs/UC_05990.JPG')" }}
           initial={{ scale: 1.2 }}
           animate={{ scale: 1 }}
           transition={{ duration: 2, ease: "easeOut" }}
         />
-        
+
         {/* Overlay */}
-        <motion.div 
+        <motion.div
           className="absolute inset-0 bg-black/50"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5, duration: 1 }}
         />
-        
+
         {/* Content with delayed animation */}
-        <motion.div 
+        <motion.div
           className="absolute bottom-8 left-8 flex flex-col items-start"
           initial={{ opacity: 0, x: -50 }}
           animate={{ opacity: isLoaded ? 1 : 0, x: isLoaded ? 0 : -50 }}
           transition={{ delay: 1.2, duration: 0.8, ease: "easeOut" }}
         >
-          <h1 className="text-5xl text-white mb-4 font-[400] tracking-tight">THE WHOLE 9 YARDS</h1>
+          <h1 className="text-5xl text-white mb-4 font-[400] tracking-tight">
+            THE WHOLE 9 YARDS
+          </h1>
           <p className="text-white text-lg max-w-xl font-[400] tracking-tight">
-            The whole 9 yards is a platform for startups to connect with investors and mentors.
+              The whole 9 yards is a design studio that creates distinctive interiors that are understated and soulful, weaving together a delicate balance of diverse materials and contemporary design.
           </p>
         </motion.div>
       </section>
 
-      {/* About Us Section */}
-      <section id="about" className="min-h-screen bg-black text-white py-20 px-8">
-        <div className="max-w-4xl mx-auto">
-          <motion.h2 
-            className="text-4xl md:text-6xl font-bold mb-12 text-center tracking-tight"
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-          >
-            ABOUT US
-          </motion.h2>
-          
-          <div className="space-y-8 text-lg leading-relaxed font-[400]">
-            <motion.p
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              viewport={{ once: true }}
-            >
-              Here at The Whole Nine Yards we create distinctive interiors that are understated and soulful, weaving together a delicate balance of diverse materials and contemporary design. Inspired by the Japanese philosophy of wabi-sabi, an aesthetic that focuses on finding the beauty in imperfection, Our Design Studio will create a bespoke plan to transform your space.
-            </motion.p>
-            
-            <motion.p
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              viewport={{ once: true }}
-            >
-              Founded by Sana Malik, who has over ten years of experience as a designer, The whole nine yards has a personal approach to every design, and clients will work closely with Sana at all stages. Building relationships with her clients gives Sana the opportunity to create designs that are personal, unique and understand the needs of the client and the space, so that your home tells your story.
-            </motion.p>
-            
-            <motion.p
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.6 }}
-              viewport={{ once: true }}
-            >
-              We use many different kinds of materials paired with muted and desaturated colours to create an organic space that feels calm. Sana&apos;s designs are eclectic and characterful, preferring to follow the flow of the space and be guided by her client&apos;s personal taste. The company leans towards using textiles and buying furniture that is built to last, as well as reupholstering existing furniture, sourcing out products unique to the needs of each specific project.
-            </motion.p>
-            
-            <motion.p
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.8 }}
-              viewport={{ once: true }}
-            >
-              We also specialize in furnishing holiday rentals where our curated selection of furniture pieces combines sleek aesthetics with functionality. From space-saving sofa bed to stylish vanity unit, each piece is carefully chosen to complement the design while offering practicality and comfort.
-            </motion.p>
-            
-            <motion.p
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 1.0 }}
-              viewport={{ once: true }}
-            >
-              Sana&apos;s experience in the industry has given her the opportunity to build relationships with specialist suppliers that offer high end craft, from sourcing anything from materials to bespoke joinery and upholstery.
-            </motion.p>
+      {/* About Us & Mission Section */}
+      <section
+        id="about"
+        className="min-h-screen bg-black text-white py-20 px-8"
+      >
+        <div className="max-w-7xl mx-auto">
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+            {/* About Us Column */}
+            <div>
+              <motion.h3
+                className="text-2xl md:text-3xl font-bold mb-8 tracking-tight"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+                viewport={{ once: true }}
+              >
+                ABOUT US
+              </motion.h3>
+              
+              <div className="space-y-6 text-base md:text-lg leading-relaxed font-[400]">
+                <motion.p
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                  viewport={{ once: true }}
+                >
+                  Here at The Whole Nine Yards we create distinctive interiors that
+                  are understated and soulful, weaving together a delicate balance
+                  of diverse materials and contemporary design. Inspired by the
+                  Japanese philosophy of wabi-sabi, an aesthetic that focuses on
+                  finding the beauty in imperfection, Our Design Studio will create
+                  a bespoke plan to transform your space.
+                </motion.p>
+
+                <motion.p
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.4 }}
+                  viewport={{ once: true }}
+                >
+                  Founded by Sana Malik, who has over ten years of experience as a
+                  designer, The whole nine yards has a personal approach to every
+                  design, and clients will work closely with Sana at all stages.
+                  Building relationships with her clients gives Sana the opportunity
+                  to create designs that are personal, unique and understand the
+                  needs of the client and the space, so that your home tells your
+                  story.
+                </motion.p>
+
+                <motion.p
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.6 }}
+                  viewport={{ once: true }}
+                >
+                  We use many different kinds of materials paired with muted and
+                  desaturated colours to create an organic space that feels calm.
+                  Sana&apos;s designs are eclectic and characterful, preferring to
+                  follow the flow of the space and be guided by her client&apos;s
+                  personal taste. The company leans towards using textiles and
+                  buying furniture that is built to last, as well as reupholstering
+                  existing furniture, sourcing out products unique to the needs of
+                  each specific project.
+                </motion.p>
+
+                <motion.p
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.8 }}
+                  viewport={{ once: true }}
+                >
+                  We also specialize in furnishing holiday rentals where our curated
+                  selection of furniture pieces combines sleek aesthetics with
+                  functionality. From space-saving sofa bed to stylish vanity unit,
+                  each piece is carefully chosen to complement the design while
+                  offering practicality and comfort.
+                </motion.p>
+
+                <motion.p
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 1.0 }}
+                  viewport={{ once: true }}
+                >
+                  Sana&apos;s experience in the industry has given her the
+                  opportunity to build relationships with specialist suppliers that
+                  offer high end craft, from sourcing anything from materials to
+                  bespoke joinery and upholstery.
+                </motion.p>
+              </div>
+            </div>
+
+            {/* Mission Column */}
+            <div>
+              <motion.h3
+                className="text-2xl md:text-3xl font-bold mb-8 tracking-tight"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+                viewport={{ once: true }}
+              >
+                OUR MISSION
+              </motion.h3>
+              
+              <div className="space-y-8 text-base md:text-lg leading-relaxed font-[400]">
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                  viewport={{ once: true }}
+                >
+                  <h4 className="text-xl font-semibold mb-3 text-white/90">Contemporary Elegance</h4>
+                  <p className="text-white/80">
+                    Our design concept revolves around a contemporary aesthetic with elegant touches to create
+                    a sophisticated ambiance. Clean lines, neutral colour palettes, and luxurious
+                    materials are prominently featured throughout every project.
+                  </p>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.4 }}
+                  viewport={{ once: true }}
+                >
+                  <h4 className="text-xl font-semibold mb-3 text-white/90">Maximizing Space</h4>
+                  <p className="text-white/80">
+                    We believe that every space has its own unique potential. Our
+                    team is passionate about transforming homes and businesses by making the
+                    most out of every inch. Whether it&apos;s a cozy apartment or a bustling office, we take
+                    pride in designing environments that reflect your style while maximizing
+                    usability.
+                  </p>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.6 }}
+                  viewport={{ once: true }}
+                >
+                  <h4 className="text-xl font-semibold mb-3 text-white/90">Premium Finishes</h4>
+                  <p className="text-white/80">
+                    Quality is paramount in our design approach. We use premium
+                    finishes and materials to ensure durability, longevity, and a luxurious feel.
+                    From high-end furniture options to custom tv panels every detail exudes
+                    quality and craftsmanship.
+                  </p>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.8 }}
+                  viewport={{ once: true }}
+                >
+                  <h4 className="text-xl font-semibold mb-3 text-white/90">Colour Schemes</h4>
+                  <p className="text-white/80">
+                    We present you with a range of colour schemes to choose from,
+                    ranging from calming neutrals to comforting hues. Each colour scheme will
+                    be thoughtfully curated to enhance the overall aesthetic and mood of the project.
+                  </p>
+                </motion.div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -544,13 +704,15 @@ export default function Home() {
               transition={{ duration: 0.6 }}
               viewport={{ once: true }}
             >
-              <h3 className="text-2xl font-bold mb-6 tracking-tight">THE WHOLE 9 YARDS</h3>
+              <h3 className="text-2xl font-bold mb-6 tracking-tight">
+                THE WHOLE 9 YARDS
+              </h3>
               <p className="text-white/80 leading-relaxed mb-4">
-                Creating distinctive interiors that are understated and soulful, weaving together a delicate balance of diverse materials and contemporary design.
+                Creating distinctive interiors that are understated and soulful,
+                weaving together a delicate balance of diverse materials and
+                contemporary design.
               </p>
-              <p className="text-white/60 text-sm">
-                Founded by Sana Malik
-              </p>
+              <p className="text-white/60 text-sm">Founded by Sana Malik</p>
             </motion.div>
 
             {/* Quick Links */}
@@ -560,20 +722,31 @@ export default function Home() {
               transition={{ duration: 0.6, delay: 0.2 }}
               viewport={{ once: true }}
             >
-              <h4 className="text-lg font-bold mb-6 tracking-tight">QUICK LINKS</h4>
+              <h4 className="text-lg font-bold mb-6 tracking-tight">
+                QUICK LINKS
+              </h4>
               <ul className="space-y-3">
                 <li>
-                  <a href="#" className="text-white/80 hover:text-white transition-colors duration-200">
+                  <a
+                    href="#"
+                    className="text-white/80 hover:text-white transition-colors duration-200"
+                  >
                     Home
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="text-white/80 hover:text-white transition-colors duration-200">
+                  <a
+                    href="#"
+                    className="text-white/80 hover:text-white transition-colors duration-200"
+                  >
                     About Us
                   </a>
                 </li>
                 <li>
-                  <a href="#" className="text-white/80 hover:text-white transition-colors duration-200">
+                  <a
+                    href="#"
+                    className="text-white/80 hover:text-white transition-colors duration-200"
+                  >
                     Portfolio
                   </a>
                 </li>
@@ -597,24 +770,36 @@ export default function Home() {
               transition={{ duration: 0.6, delay: 0.4 }}
               viewport={{ once: true }}
             >
-              <h4 className="text-lg font-bold mb-6 tracking-tight">GET IN TOUCH</h4>
+              <h4 className="text-lg font-bold mb-6 tracking-tight">
+                GET IN TOUCH
+              </h4>
               <div className="space-y-4">
                 <div>
                   <p className="text-white/60 text-sm mb-1">Email</p>
-                  <a href="mailto:hello@thewhole9yards.com" className="text-white/80 hover:text-white transition-colors duration-200">
-                    hello@thewhole9yards.com
+                  <a
+                    href="mailto:Sana@thew9y.com"
+                    className="text-white/80 hover:text-white transition-colors duration-200"
+                  >
+                    Sana@thew9y.com
                   </a>
                 </div>
                 <div>
                   <p className="text-white/60 text-sm mb-1">Phone</p>
-                  <a href="tel:+1234567890" className="text-white/80 hover:text-white transition-colors duration-200">
-                    +971 (050) 156 2323 
+                  <a
+                    href="tel:+971501562323"
+                    className="text-white/80 hover:text-white transition-colors duration-200"
+                  >
+                    +971 50 156 2323
                   </a>
                 </div>
                 <div>
                   <p className="text-white/60 text-sm mb-1">Follow Us</p>
                   <div className="flex space-x-4 mt-2">
-                    <a href="https://www.instagram.com/thewhole9yards.ae/" target="_blank" className="text-white/60 hover:text-white transition-colors duration-200">
+                    <a
+                      href="https://www.instagram.com/thewhole9yards.ae/"
+                      target="_blank"
+                      className="text-white/60 hover:text-white transition-colors duration-200"
+                    >
                       Instagram
                     </a>
                     {/* <a href="#" className="text-white/60 hover:text-white transition-colors duration-200">
@@ -641,10 +826,16 @@ export default function Home() {
               © 2024 The Whole 9 Yards. All rights reserved.
             </p>
             <div className="flex space-x-6">
-              <a href="#" className="text-white/60 hover:text-white text-sm transition-colors duration-200">
+              <a
+                href="#"
+                className="text-white/60 hover:text-white text-sm transition-colors duration-200"
+              >
                 Privacy Policy
               </a>
-              <a href="#" className="text-white/60 hover:text-white text-sm transition-colors duration-200">
+              <a
+                href="#"
+                className="text-white/60 hover:text-white text-sm transition-colors duration-200"
+              >
                 Terms of Service
               </a>
             </div>
