@@ -141,7 +141,8 @@ export default function PortfolioManager() {
       }
     } catch (error) {
       console.error('Upload error:', error);
-      alert('Failed to upload image. Please try again.');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to upload image. Please try again.';
+      alert(errorMessage);
     } finally {
       setIsUploading(false);
     }
@@ -790,7 +791,7 @@ export default function PortfolioManager() {
                     <Input
                       id="thumbnail"
                       type="file"
-                      accept="image/*"
+                      accept="image/jpeg,image/jpg,image/png,image/webp"
                       onChange={(e) => handleImageUpload(e, 'thumbnail')}
                       disabled={isUploading}
                       className="bg-gray-800 border-gray-700 text-white file:text-white"
@@ -827,7 +828,7 @@ export default function PortfolioManager() {
                     <Input
                       id="pictures"
                       type="file"
-                      accept="image/*"
+                      accept="image/jpeg,image/jpg,image/png,image/webp"
                       multiple
                       onChange={(e) => handleImageUpload(e, 'pictures')}
                       disabled={isUploading}

@@ -16,10 +16,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid file type. Please upload JPEG, PNG, or WebP images.' }, { status: 400 });
     }
 
-    // Validate file size (max 5MB)
-    const maxSize = 5 * 1024 * 1024; // 5MB
+    // Validate file size (max 50MB)
+    const maxSize = 50 * 1024 * 1024; // 50MB
     if (file.size > maxSize) {
-      return NextResponse.json({ error: 'File too large. Maximum size is 5MB.' }, { status: 400 });
+      return NextResponse.json({ error: 'File too large. Maximum size is 50MB.' }, { status: 400 });
     }
 
     const imageUrl = await DatabaseService.uploadImage(file);

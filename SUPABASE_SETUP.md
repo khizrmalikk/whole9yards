@@ -70,7 +70,7 @@ supabase db push
 3. Bucket details:
    - **Name**: `project-images`
    - **Public bucket**: ✅ Checked
-   - **File size limit**: 5MB
+   - **File size limit**: 50MB
    - **Allowed MIME types**: `image/jpeg,image/jpg,image/png,image/webp`
 4. Click "Create bucket"
 
