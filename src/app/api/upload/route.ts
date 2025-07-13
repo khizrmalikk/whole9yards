@@ -1,9 +1,23 @@
 import { NextResponse } from 'next/server';
 import { DatabaseService } from '@/lib/database';
 
+// Configure route for larger file uploads
+export const maxDuration = 60; // 60 seconds timeout
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: Request) {
   try {
-    const formData = await request.formData();
+    let formData;
+    try {
+      formData = await request.formData();
+    } catch (error) {
+      // This might be a "Request Entity Too Large" error
+      console.error('Error parsing form data:', error);
+      return NextResponse.json({ 
+        error: 'Request too large. Please try a smaller file or check file size limits.' 
+      }, { status: 413 });
+    }
+    
     const file = formData.get('file') as File;
     
     if (!file) {

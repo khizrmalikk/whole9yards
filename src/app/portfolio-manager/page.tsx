@@ -109,8 +109,25 @@ export default function PortfolioManager() {
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Failed to upload image');
+      let errorMessage = 'Failed to upload image';
+      
+      // Check if response is JSON
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        try {
+          const error = await response.json();
+          errorMessage = error.error || errorMessage;
+        } catch (jsonError) {
+          // If JSON parsing fails, use the response text
+          errorMessage = await response.text() || errorMessage;
+        }
+      } else {
+        // If not JSON, get the text response
+        const textResponse = await response.text();
+        errorMessage = textResponse || `HTTP ${response.status}: ${response.statusText}`;
+      }
+      
+      throw new Error(errorMessage);
     }
 
     const { url } = await response.json();
