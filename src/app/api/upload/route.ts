@@ -1,45 +1,48 @@
+import { handleUpload, type HandleUploadBody } from '@vercel/blob/client';
 import { NextResponse } from 'next/server';
-import { DatabaseService } from '@/lib/database';
 
-// Configure route for larger file uploads
-export const maxDuration = 60; // 60 seconds timeout
-export const dynamic = 'force-dynamic';
+export async function POST(request: Request): Promise<NextResponse> {
+  const body = (await request.json()) as HandleUploadBody;
 
-export async function POST(request: Request) {
   try {
-    let formData;
-    try {
-      formData = await request.formData();
-    } catch (error) {
-      // This might be a "Request Entity Too Large" error
-      console.error('Error parsing form data:', error);
-      return NextResponse.json({ 
-        error: 'Request too large. Please try a smaller file or check file size limits.' 
-      }, { status: 413 });
-    }
-    
-    const file = formData.get('file') as File;
-    
-    if (!file) {
-      return NextResponse.json({ error: 'No file provided' }, { status: 400 });
-    }
+    const jsonResponse = await handleUpload({
+      body,
+      request,
+      onBeforeGenerateToken: async (
+        pathname: string,
+        /* clientPayload?: string, */
+      ) => {
+        // Generate a client token for the browser to upload the file
+        // For now, we'll allow all uploads - in production you'd want authentication
+        
+        return {
+          allowedContentTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
+          tokenPayload: JSON.stringify({
+            // optional, sent to your server on upload completion
+            uploadTime: new Date().toISOString(),
+          }),
+        };
+      },
+      onUploadCompleted: async ({ blob, tokenPayload }) => {
+        // Get notified of client upload completion
+        console.log('blob upload completed', blob, tokenPayload);
+        
+        try {
+          // You can add any post-upload logic here
+          // For example, save to database, send notifications, etc.
+          console.log('File uploaded successfully:', blob.url);
+        } catch (error) {
+          console.error('Error in upload completion handler:', error);
+        }
+      },
+    });
 
-    // Validate file type
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-    if (!allowedTypes.includes(file.type)) {
-      return NextResponse.json({ error: 'Invalid file type. Please upload JPEG, PNG, or WebP images.' }, { status: 400 });
-    }
-
-    // Validate file size (max 50MB)
-    const maxSize = 50 * 1024 * 1024; // 50MB
-    if (file.size > maxSize) {
-      return NextResponse.json({ error: 'File too large. Maximum size is 50MB.' }, { status: 400 });
-    }
-
-    const imageUrl = await DatabaseService.uploadImage(file);
-    return NextResponse.json({ url: imageUrl });
+    return NextResponse.json(jsonResponse);
   } catch (error) {
-    console.error('API Error uploading image:', error);
-    return NextResponse.json({ error: 'Failed to upload image' }, { status: 500 });
+    console.error('Upload error:', error);
+    return NextResponse.json(
+      { error: (error as Error).message },
+      { status: 400 }
+    );
   }
 } 

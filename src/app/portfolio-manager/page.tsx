@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { IconPlus, IconEdit, IconTrash, IconEye, IconEyeOff, IconUpload, IconX, IconHome, IconFilter, IconGrid3x3, IconList } from "@tabler/icons-react";
 import { DatabaseService } from "@/lib/database";
+import { upload } from '@vercel/blob/client';
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -100,38 +101,18 @@ export default function PortfolioManager() {
   };
 
   const uploadImage = async (file: File): Promise<string> => {
-    const formData = new FormData();
-    formData.append('file', file);
-
-    const response = await fetch('/api/upload', {
-      method: 'POST',
-      body: formData,
-    });
-
-    if (!response.ok) {
-      let errorMessage = 'Failed to upload image';
+    try {
+      // Use client-side upload to Vercel Blob
+      const blob = await upload(file.name, file, {
+        access: 'public',
+        handleUploadUrl: '/api/upload',
+      });
       
-      // Check if response is JSON
-      const contentType = response.headers.get('content-type');
-      if (contentType && contentType.includes('application/json')) {
-        try {
-          const error = await response.json();
-          errorMessage = error.error || errorMessage;
-        } catch (jsonError) {
-          // If JSON parsing fails, use the response text
-          errorMessage = await response.text() || errorMessage;
-        }
-      } else {
-        // If not JSON, get the text response
-        const textResponse = await response.text();
-        errorMessage = textResponse || `HTTP ${response.status}: ${response.statusText}`;
-      }
-      
-      throw new Error(errorMessage);
+      return blob.url;
+    } catch (error) {
+      console.error('Upload error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Failed to upload image');
     }
-
-    const { url } = await response.json();
-    return url;
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'pictures' | 'thumbnail') => {

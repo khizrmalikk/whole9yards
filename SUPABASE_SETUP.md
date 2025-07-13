@@ -23,6 +23,22 @@ Once your project is created:
    - **Project URL** (looks like: `https://xxxxx.supabase.co`)
    - **Public anon key** (starts with `eyJ...`)
 
+## 2.1. Set Up Vercel Blob (For Large File Uploads)
+
+**Why use Vercel Blob?** Vercel Functions have a 4.5MB request body limit. For larger files (like high-resolution images), we use Vercel Blob with client-side uploads to bypass this limit. Files are uploaded directly from your browser to Vercel's blob storage.
+
+1. Go to your [Vercel Dashboard](https://vercel.com/dashboard)
+2. Navigate to **Storage** → **Blob** → **Create Store**
+3. Choose a name for your blob store (e.g., `portfolio-images`)
+4. Once created, go to the **Settings** tab
+5. Copy the **BLOB_READ_WRITE_TOKEN** value
+
+**Benefits:**
+- No file size limits (up to 100MB on Pro plan)
+- Faster uploads (direct to storage)
+- Global CDN delivery
+- Automatic image optimization
+
 ## 3. Set Up Environment Variables
 
 Create a `.env.local` file in your project root:
@@ -31,6 +47,9 @@ Create a `.env.local` file in your project root:
 # Supabase Configuration
 NEXT_PUBLIC_SUPABASE_URL=your_project_url_here
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key_here
+
+# Vercel Blob Configuration (for large file uploads)
+BLOB_READ_WRITE_TOKEN=your_blob_token_here
 
 # Portfolio Manager Password (change this!)
 PORTFOLIO_MANAGER_PASSWORD=your_secure_password_here
@@ -63,40 +82,42 @@ supabase link --project-ref your-project-ref
 supabase db push
 ```
 
-## 5. Set Up Image Storage
+## 5. ~~Set Up Image Storage~~ (No longer needed)
 
-1. Go to **Storage** in your Supabase dashboard
-2. Click "Create a new bucket"
-3. Bucket details:
-   - **Name**: `project-images`
-   - **Public bucket**: ✅ Checked
-   - **File size limit**: 50MB
-   - **Allowed MIME types**: `image/jpeg,image/jpg,image/png,image/webp`
-4. Click "Create bucket"
+**Note:** We no longer use Supabase storage for images. All image uploads are handled via Vercel Blob for better performance and no size limits.
 
-### Set Storage Policies
+~~1. Go to **Storage** in your Supabase dashboard~~ (Skip this step)
+~~2. Click "Create a new bucket"~~ (Skip this step)
+~~3. Bucket details:~~
+   ~~- **Name**: `project-images`~~
+   ~~- **Public bucket**: ✅ Checked~~
+   ~~- **File size limit**: 50MB~~
+   ~~- **Allowed MIME types**: `image/jpeg,image/jpg,image/png,image/webp`~~
+~~4. Click "Create bucket"~~ (Skip this step)
 
-Go to **Storage** → **Policies** and create these policies:
+### ~~Set Storage Policies~~ (No longer needed)
 
-**For the `project-images` bucket:**
+~~Go to **Storage** → **Policies** and create these policies:~~ (Skip this section)
 
-1. **Policy 1 - Public Read Access**:
-   ```sql
-   CREATE POLICY "Public Access" ON storage.objects 
-   FOR SELECT USING (bucket_id = 'project-images');
-   ```
+~~**For the `project-images` bucket:**~~
 
-2. **Policy 2 - Allow Uploads** (if you want authentication):
-   ```sql
-   CREATE POLICY "Allow uploads" ON storage.objects 
-   FOR INSERT WITH CHECK (bucket_id = 'project-images');
-   ```
+~~1. **Policy 1 - Public Read Access**:~~
+   ~~```sql~~
+   ~~CREATE POLICY "Public Access" ON storage.objects~~
+   ~~FOR SELECT USING (bucket_id = 'project-images');~~
+   ~~```~~
 
-3. **Policy 3 - Allow Deletes** (if you want authentication):
-   ```sql
-   CREATE POLICY "Allow deletes" ON storage.objects 
-   FOR DELETE USING (bucket_id = 'project-images');
-   ```
+~~2. **Policy 2 - Allow Uploads** (if you want authentication):~~
+   ~~```sql~~
+   ~~CREATE POLICY "Allow uploads" ON storage.objects~~
+   ~~FOR INSERT WITH CHECK (bucket_id = 'project-images');~~
+   ~~```~~
+
+~~3. **Policy 3 - Allow Deletes** (if you want authentication):~~
+   ~~```sql~~
+   ~~CREATE POLICY "Allow deletes" ON storage.objects~~
+   ~~FOR DELETE USING (bucket_id = 'project-images');~~
+   ~~```~~
 
 ## 6. Test Your Setup
 

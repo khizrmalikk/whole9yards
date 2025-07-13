@@ -88,42 +88,7 @@ export class DatabaseService {
     }
   }
 
-  // Upload an image to Supabase Storage
-  static async uploadImage(file: File, bucket: string = 'project-images'): Promise<string> {
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-    const filePath = `${fileName}`;
-
-    const { data, error } = await supabase.storage
-      .from(bucket)
-      .upload(filePath, file);
-
-    if (error) {
-      console.error('Error uploading image:', error);
-      throw error;
-    }
-
-    // Get the public URL
-    const { data: { publicUrl } } = supabase.storage
-      .from(bucket)
-      .getPublicUrl(filePath);
-
-    return publicUrl;
-  }
-
-  // Delete an image from Supabase Storage
-  static async deleteImage(url: string, bucket: string = 'project-images'): Promise<void> {
-    // Extract file path from URL
-    const urlParts = url.split('/');
-    const fileName = urlParts[urlParts.length - 1];
-
-    const { error } = await supabase.storage
-      .from(bucket)
-      .remove([fileName]);
-
-    if (error) {
-      console.error('Error deleting image:', error);
-      throw error;
-    }
-  }
+  // Note: Image uploads are now handled via Vercel Blob client-side uploads
+  // This bypasses the 4.5MB Vercel function limit for large files
+  // See /api/upload route for the upload handler
 } 
