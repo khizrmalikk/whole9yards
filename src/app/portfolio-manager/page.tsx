@@ -102,8 +102,14 @@ export default function PortfolioManager() {
 
   const uploadImage = async (file: File): Promise<string> => {
     try {
+      // Generate unique filename to avoid conflicts
+      const fileExtension = file.name.split('.').pop();
+      const timestamp = Date.now();
+      const randomSuffix = Math.random().toString(36).substring(2, 8);
+      const uniqueFilename = `${timestamp}-${randomSuffix}.${fileExtension}`;
+      
       // Use client-side upload to Vercel Blob
-      const blob = await upload(file.name, file, {
+      const blob = await upload(uniqueFilename, file, {
         access: 'public',
         handleUploadUrl: '/api/upload',
       });

@@ -216,3 +216,35 @@ If you encounter issues:
 ---
 
 🎉 **You're all set!** Your portfolio should now be connected to Supabase with full database and image storage capabilities. 
+
+## ✅ **The Fix:**
+
+Instead of using the original filename (which can cause conflicts), the system now generates **unique filenames** using:
+
+1. **Timestamp** - `Date.now()` ensures uniqueness by time
+2. **Random suffix** - 6 random characters for extra uniqueness  
+3. **Original extension** - Preserves the file type
+
+**Example filename:** `1706123456789-abc123.jpg`
+
+## 🎯 **Why This Happens:**
+
+Vercel Blob prevents accidental overwrites by default. If you upload:
+- `photo.jpg` 
+- Then upload another `photo.jpg`
+
+It throws the error you saw. Our fix ensures every upload gets a unique name.
+
+## 🚀 **Alternative Solutions:**
+
+If you prefer different behavior, you could also use:
+
+```javascript
+<code_block_to_apply_changes_from>
+```
+
+But our current solution gives you **full control** over the filename format and ensures **no data loss**.
+
+## 📋 **Test It:**
+
+Try uploading your large file again - the error should be gone and the upload should succeed with a unique filename! 
