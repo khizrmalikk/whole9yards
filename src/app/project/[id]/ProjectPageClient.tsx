@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Project } from "@/types/project";
 import { Navbar, NavBody, NavItems, NavbarLogo, NavbarButton } from "@/components/ui/resizable-navbar";
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
+import Image from "next/image";
 
 export function ProjectPageClient({ projectId }: { projectId: string }) {
   const [project, setProject] = useState<Project | null>(null);
@@ -237,12 +238,22 @@ export function ProjectPageClient({ projectId }: { projectId: string }) {
       {/* Hero Section with Main Image - accounting for navbar */}
       <section className="h-screen relative overflow-hidden -mt-20">
         <motion.div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url('${project.pictures[currentImageIndex] || project.thumbnail}')` }}
+          className="absolute inset-0"
           initial={{ scale: 1.1 }}
           animate={{ scale: 1 }}
           transition={{ duration: 1.5, delay: 0.3 }}
-        />
+        >
+          <Image
+            src={project.pictures[currentImageIndex] || project.thumbnail}
+            alt={`${project.title} hero image`}
+            fill
+            sizes="100vw"
+            className="object-cover"
+            priority
+            placeholder="blur"
+            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkrHB0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyDjckkkfxfkBlm9n"
+          />
+        </motion.div>
         <div className="absolute inset-0 bg-black/50" />
         
         <div className="absolute bottom-8 left-8 right-8">
@@ -313,11 +324,17 @@ export function ProjectPageClient({ projectId }: { projectId: string }) {
             onMouseEnter={() => setIsAutoScrolling(false)}
             onMouseLeave={() => setIsAutoScrolling(true)}
           >
-            <img
-              src={project.pictures[currentImageIndex] || project.thumbnail}
-              alt={`${project.title} - Image ${currentImageIndex + 1}`}
-              className="w-full h-[70vh] object-cover rounded-lg"
-            />
+            <div className="relative w-full h-[70vh]">
+              <Image
+                src={project.pictures[currentImageIndex] || project.thumbnail}
+                alt={`${project.title} - Image ${currentImageIndex + 1}`}
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 60vw"
+                className="object-cover rounded-lg"
+                placeholder="blur"
+                blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkrHB0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyDjckkkfxfkBlm9n"
+              />
+            </div>
             
             {/* Navigation Arrows */}
             {project.pictures.length > 1 && (

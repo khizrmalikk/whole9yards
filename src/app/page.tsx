@@ -10,6 +10,7 @@ import { motion, useInView } from "motion/react";
 import { useState, useEffect, useRef } from "react";
 import { Project } from "@/types/project";
 import Link from "next/link";
+import Image from "next/image";
 
 // Fallback data for when no projects exist
 const fallbackData: Project[] = [
@@ -130,11 +131,20 @@ const Card = ({ data, index, isFullWidth }: CardProps) => {
           delay: index * 0.1, // Stagger animation based on card index
           ease: "easeOut",
         }}
-        className={`relative overflow-hidden h-screen bg-cover bg-center cursor-pointer group`}
-        style={{
-          backgroundImage: `url('${data.thumbnail}')`,
-        }}
+        className={`relative overflow-hidden h-screen cursor-pointer group`}
       >
+        {/* Optimized background image */}
+        <Image
+          src={data.thumbnail}
+          alt={data.title}
+          fill
+          sizes="(max-width: 768px) 100vw, 50vw"
+          className="object-cover"
+          priority={index < 2} // Prioritize first 2 images
+          placeholder="blur"
+          blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkrHB0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyDjckkkfxfkBlm9n" // Simple blur placeholder
+        />
+        
         {/* Dark overlay for better text visibility */}
         <motion.div
           className="absolute inset-0 bg-black/40 group-hover:bg-black/60 transition-colors duration-300"
@@ -487,12 +497,22 @@ export default function Home() {
       <section className="flex flex-col items-center justify-center h-screen overflow-hidden">
         {/* Background image with zoom animation */}
         <motion.div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: "url('/bgs/UC_05990.JPG')" }}
+          className="absolute inset-0"
           initial={{ scale: 1.2 }}
           animate={{ scale: 1 }}
           transition={{ duration: 2, ease: "easeOut" }}
-        />
+        >
+          <Image
+            src="/bgs/UC_05990.JPG"
+            alt="Hero background"
+            fill
+            sizes="100vw"
+            className="object-cover"
+            priority
+            placeholder="blur"
+            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkrHB0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyDjckkkfxfkBlm9n"
+          />
+        </motion.div>
 
         {/* Overlay */}
         <motion.div

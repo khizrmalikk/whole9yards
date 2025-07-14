@@ -4,6 +4,7 @@ import { motion } from "motion/react";
 import { IconPlus, IconEdit, IconTrash, IconEye, IconEyeOff, IconUpload, IconX, IconHome, IconFilter, IconGrid3x3, IconList } from "@tabler/icons-react";
 import { DatabaseService } from "@/lib/database";
 import { upload } from '@vercel/blob/client';
+import imageCompression from 'browser-image-compression';
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -100,16 +101,38 @@ export default function PortfolioManager() {
     setProjects(updatedProjects);
   };
 
+  const compressImage = async (file: File): Promise<File> => {
+    const options = {
+      maxSizeMB: 1, // Compress to max 1MB
+      maxWidthOrHeight: 1920, // Max resolution 1920px
+      useWebWorker: true,
+      fileType: 'image/jpeg', // Convert to JPEG for better compression
+      quality: 0.8, // 80% quality - good balance of quality/size
+    };
+
+    try {
+      const compressedFile = await imageCompression(file, options);
+      console.log(`Original: ${(file.size / 1024 / 1024).toFixed(2)}MB → Compressed: ${(compressedFile.size / 1024 / 1024).toFixed(2)}MB`);
+      return compressedFile;
+    } catch (error) {
+      console.warn('Compression failed, using original file:', error);
+      return file; // Fallback to original if compression fails
+    }
+  };
+
   const uploadImage = async (file: File): Promise<string> => {
     try {
+      // Compress image before upload for better performance
+      const compressedFile = await compressImage(file);
+      
       // Generate unique filename to avoid conflicts
-      const fileExtension = file.name.split('.').pop();
+      const fileExtension = 'jpg'; // Always use jpg after compression
       const timestamp = Date.now();
       const randomSuffix = Math.random().toString(36).substring(2, 8);
       const uniqueFilename = `${timestamp}-${randomSuffix}.${fileExtension}`;
       
       // Use client-side upload to Vercel Blob
-      const blob = await upload(uniqueFilename, file, {
+      const blob = await upload(uniqueFilename, compressedFile, {
         access: 'public',
         handleUploadUrl: '/api/upload',
       });
