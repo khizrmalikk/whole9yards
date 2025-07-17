@@ -274,13 +274,13 @@ export function ProjectPageClient({ projectId }: { projectId: string }) {
 
         {/* Back Button */}
         <motion.button
-          onClick={() => router.back()}
+          onClick={() => router.push('/')}
           className="absolute top-24 left-16 px-4 py-2 border border-white/50 text-white hover:bg-white/10 transition-colors backdrop-blur-sm z-40"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.3 }}
         >
-          ← Back
+          <IconChevronLeft size={24} />
         </motion.button>
       </section>
 
@@ -324,13 +324,13 @@ export function ProjectPageClient({ projectId }: { projectId: string }) {
             onMouseEnter={() => setIsAutoScrolling(false)}
             onMouseLeave={() => setIsAutoScrolling(true)}
           >
-            <div className="relative w-full h-[70vh]">
+            <div className="relative w-full h-[70vh] bg-black/10 rounded-lg">
               <Image
                 src={project.pictures[currentImageIndex] || project.thumbnail}
                 alt={`${project.title} - Image ${currentImageIndex + 1}`}
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 60vw"
-                className="object-cover rounded-lg"
+                className="object-contain rounded-lg"
                 placeholder="blur"
                 blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkrHB0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyDjckkkfxfkBlm9n"
               />
