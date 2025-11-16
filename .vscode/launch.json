@@ -1,8 +1,8 @@
 {
     "configurations": [
     {
-        "command": "bun run dev",
-        "name": "Run bun run dev",
+        "command": "npm run dev",
+        "name": "Run npm run dev",
         "request": "launch",
         "type": "node-terminal"
     }

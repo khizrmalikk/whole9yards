@@ -7,7 +7,7 @@ import {
   NavbarButton,
 } from "@/components/ui/resizable-navbar";
 import { motion, useInView } from "motion/react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { Project } from "@/types/project";
 import Link from "next/link";
 import Image from "next/image";
@@ -91,13 +91,85 @@ const fallbackData: Project[] = [
   // },
 ];
 
+const heroHighlights = [
+  {
+    tag: "Residential",
+    title: "Layered homes",
+    description:
+      "Understated apartments and villas that balance calm palettes with one-of-a-kind objects.",
+  },
+  {
+    tag: "Hospitality",
+    title: "Boutique stays",
+    description:
+      "Sculpted guest experiences for rentals and hotels with resilient materials and curated art.",
+  },
+  {
+    tag: "Commercial",
+    title: "Purposeful workspaces",
+    description:
+      "Studios and offices that pair ergonomic planning with tactile finishes and lighting.",
+  },
+];
+
+const studioMetrics = [
+  { label: "Years crafting interiors", value: "10+" },
+  { label: "Completed spaces", value: "120" },
+  { label: "Cities we service", value: "3" },
+  { label: "Custom pieces sourced", value: "350+" },
+];
+
+const aboutHighlights = [
+  {
+    title: "Bespoke partnership",
+    description:
+      "We keep the studio intentionally small so every client collaborates directly with Sana—from mood boards and sourcing to the final styling day.",
+  },
+  {
+    title: "Layered materiality",
+    description:
+      "Our wabi-sabi lens pairs limewash, raw timber, handmade textiles, and curated art to create soulful rooms that feel collected rather than staged.",
+  },
+  {
+    title: "Purposeful furnishing",
+    description:
+      "We mix heirloom-quality pieces with vintage finds, reupholster what you love, and source statement items that add character without visual noise.",
+  },
+];
+
+const missionPillars = [
+  {
+    title: "Contemporary calm",
+    description:
+      "Clean architectural lines soften with tactile fabrics and artful lighting to create quietly confident spaces.",
+    focus: "Aesthetic",
+  },
+  {
+    title: "Space fluency",
+    description:
+      "Smart planning ensures every square foot works hard—whether it is a family home, boutique rental, or collaborative workspace.",
+    focus: "Planning",
+  },
+  {
+    title: "Premium craft",
+    description:
+      "A trusted network of artisans delivers bespoke joinery, upholstery, and finishes that age beautifully.",
+    focus: "Craft",
+  },
+  {
+    title: "Thoughtful palettes",
+    description:
+      "Layered neutrals, warm woods, and muted metals set the tone while tailored colour accents keep each project distinct.",
+    focus: "Colour",
+  },
+];
+
 interface CardProps {
   data: Project;
   index: number;
-  isFullWidth: boolean;
 }
 
-const Card = ({ data, index, isFullWidth }: CardProps) => {
+const Card = ({ data, index }: CardProps) => {
   const ref = useRef(null);
   const isInView = useInView(ref, {
     once: true,
@@ -107,8 +179,7 @@ const Card = ({ data, index, isFullWidth }: CardProps) => {
   return (
     <Link
       href={`/project/${data.id}`}
-      className="block"
-      style={{ gridColumn: isFullWidth ? "span 2" : "span 1" }}
+      className="group block focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
     >
       <motion.div
         ref={ref}
@@ -131,294 +202,163 @@ const Card = ({ data, index, isFullWidth }: CardProps) => {
           delay: index * 0.1, // Stagger animation based on card index
           ease: "easeOut",
         }}
-        className={`relative overflow-hidden h-screen cursor-pointer group`}
+        className="relative h-[520px] overflow-hidden rounded-[32px] border border-white/10 bg-white/5 backdrop-blur-sm"
       >
-        {/* Optimized background image */}
-        <Image
-          src={data.thumbnail}
-          alt={data.title}
-          fill
-          sizes="(max-width: 768px) 100vw, 50vw"
-          className="object-cover"
-          priority={index < 2} // Prioritize first 2 images
-          placeholder="blur"
-          blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkrHB0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyDjckkkfxfkBlm9n" // Simple blur placeholder
-        />
-        
-        {/* Dark overlay for better text visibility */}
-        <motion.div
-          className="absolute inset-0 bg-black/40 group-hover:bg-black/60 transition-colors duration-300"
-          initial={{ opacity: 0 }}
-          animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-          transition={{ duration: 0.6, delay: index * 0.1 + 0.2 }}
-        />
+        <div className="absolute inset-0">
+          <Image
+            src={data.thumbnail}
+            alt={data.title}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            className="object-cover transition-transform duration-700 group-hover:scale-105"
+            priority={index < 3}
+            placeholder="blur"
+            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkrHB0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyDjckkkfxfkBlm9n"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/40 to-black/80 transition-opacity duration-500 group-hover:from-black/30 group-hover:via-black/60 group-hover:to-black/90" />
+        </div>
 
-        {/* Hover overlay */}
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
-
-        {/* Content positioned at bottom left */}
-        <motion.div
-          className="absolute bottom-8 left-8 text-white group-hover:transform group-hover:translate-y-[-8px] transition-transform duration-300"
-          initial={{ opacity: 0, x: -50 }}
-          animate={
-            isInView
-              ? {
-                  opacity: 1,
-                  x: 0,
-                }
-              : {
-                  opacity: 0,
-                  x: -50,
-                }
-          }
-          transition={{
-            duration: 0.8,
-            delay: index * 0.1 + 0.4,
-            ease: "easeOut",
-          }}
-        >
-          <motion.h3
-            className="text-5xl font-bold mb-4 tracking-tight"
-            initial={{ opacity: 0, y: 30 }}
-            animate={
-              isInView
-                ? {
-                    opacity: 1,
-                    y: 0,
-                  }
-                : {
-                    opacity: 0,
-                    y: 30,
-                  }
-            }
-            transition={{
-              duration: 0.6,
-              delay: index * 0.1 + 0.6,
-            }}
-          >
-            {data.title}
-          </motion.h3>
-          <motion.div
-            className="space-y-2 text-sm font-[400] tracking-wide"
-            initial={{ opacity: 0, y: 20 }}
-            animate={
-              isInView
-                ? {
-                    opacity: 1,
-                    y: 0,
-                  }
-                : {
-                    opacity: 0,
-                    y: 20,
-                  }
-            }
-            transition={{
-              duration: 0.6,
-              delay: index * 0.1 + 0.8,
-            }}
-          >
-            <div className="flex items-center space-x-4">
-              <span className="text-white/80">Category:</span>
-              <span>{data.category}</span>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-white/80">Type:</span>
-              <span>{data.type}</span>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-white/80">Size:</span>
-              <span>{data.size}</span>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-white/80">Location:</span>
-              <span>{data.location}</span>
-            </div>
-          </motion.div>
-
-          {/* Click indicator */}
-          <motion.div
-            className="mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-            initial={{ opacity: 0 }}
-            animate={isInView ? { opacity: 0 } : { opacity: 0 }}
-          >
-            <span className="text-white/60 text-sm">
-              Click to view project →
+        <div className="relative z-10 flex h-full flex-col justify-between p-8 text-white">
+          <div className="flex items-center gap-3 text-sm uppercase tracking-[0.2em] text-white/70">
+            <span className="rounded-full border border-white/40 px-3 py-1 text-xs font-semibold">
+              {String(index + 1).padStart(2, "0")}
             </span>
-          </motion.div>
-        </motion.div>
+            <span>{data.category}</span>
+          </div>
+
+          <div className="space-y-5">
+            <motion.h3
+              className="text-4xl font-semibold tracking-tight"
+              initial={{ opacity: 0, y: 30 }}
+              animate={
+                isInView
+                  ? {
+                      opacity: 1,
+                      y: 0,
+                    }
+                  : {
+                      opacity: 0,
+                      y: 30,
+                    }
+              }
+              transition={{
+                duration: 0.6,
+                delay: index * 0.1 + 0.3,
+              }}
+            >
+              {data.title}
+            </motion.h3>
+
+            <div className="grid grid-cols-2 gap-3 text-sm text-white/80">
+              <div>
+                <p className="text-white/60">Type</p>
+                <p className="font-medium">{data.type}</p>
+              </div>
+              <div>
+                <p className="text-white/60">Size</p>
+                <p className="font-medium">{data.size}</p>
+              </div>
+              <div className="col-span-2">
+                <p className="text-white/60">Location</p>
+                <p className="font-medium">{data.location}</p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between text-sm text-white/70">
+              <span>View project</span>
+              <span className="text-lg transition-transform duration-300 group-hover:translate-x-1">
+                →
+              </span>
+            </div>
+          </div>
+        </div>
       </motion.div>
     </Link>
   );
 };
 
-const ProjectGrid = ({ items }: { items: Project[] }) => {
-  const renderDesktopCards = () => {
-    const cards = [];
-    let index = 0;
-    let cardIndex = 0; // For animation staggering
-
-    while (index < items.length) {
-      const remaining = items.length - index;
-
-      if (remaining >= 3 && remaining % 3 === 0) {
-        // Multiple of 3: Big card + 2 half cards pattern
-        const groupsOf3 = Math.floor(remaining / 3);
-
-        for (let group = 0; group < groupsOf3; group++) {
-          // Full width card
-          cards.push(
-            <Card
-              key={items[index].id}
-              data={items[index]}
-              isFullWidth={true}
-              index={cardIndex}
-            />
-          );
-          index++;
-          cardIndex++;
-
-          // Two half cards
-          cards.push(
-            <Card
-              key={items[index].id}
-              data={items[index]}
-              isFullWidth={false}
-              index={cardIndex}
-            />
-          );
-          index++;
-          cardIndex++;
-          cards.push(
-            <Card
-              key={items[index].id}
-              data={items[index]}
-              isFullWidth={false}
-              index={cardIndex}
-            />
-          );
-          index++;
-          cardIndex++;
-        }
-      } else if (remaining === 2) {
-        // Exactly 2 remaining: pair of half cards
-        cards.push(
-          <Card
-            key={items[index].id}
-            data={items[index]}
-            isFullWidth={false}
-            index={cardIndex}
-          />
-        );
-        index++;
-        cardIndex++;
-        cards.push(
-          <Card
-            key={items[index].id}
-            data={items[index]}
-            isFullWidth={false}
-            index={cardIndex}
-          />
-        );
-        index++;
-        cardIndex++;
-      } else if (remaining % 2 === 0 && remaining >= 4) {
-        // Even number >= 4: pairs of half cards
-        const pairsToCreate = Math.min(2, remaining / 2); // Create max 2 pairs at a time
-        for (let pair = 0; pair < pairsToCreate; pair++) {
-          cards.push(
-            <Card
-              key={items[index].id}
-              data={items[index]}
-              isFullWidth={false}
-              index={cardIndex}
-            />
-          );
-          index++;
-          cardIndex++;
-          cards.push(
-            <Card
-              key={items[index].id}
-              data={items[index]}
-              isFullWidth={false}
-              index={cardIndex}
-            />
-          );
-          index++;
-          cardIndex++;
-        }
-      } else {
-        // Odd number or single item: one full card then pairs
-        cards.push(
-          <Card
-            key={items[index].id}
-            data={items[index]}
-            isFullWidth={true}
-            index={cardIndex}
-          />
-        );
-        index++;
-        cardIndex++;
-
-        // Rest as pairs
-        while (index < items.length) {
-          cards.push(
-            <Card
-              key={items[index].id}
-              data={items[index]}
-              isFullWidth={false}
-              index={cardIndex}
-            />
-          );
-          index++;
-          cardIndex++;
-          if (index < items.length) {
-            cards.push(
-              <Card
-                key={items[index].id}
-                data={items[index]}
-                isFullWidth={false}
-                index={cardIndex}
-              />
-            );
-            index++;
-            cardIndex++;
-          }
-        }
-      }
-    }
-
-    return cards;
-  };
-
-  const renderMobileCards = () => {
-    return items.map((item, index) => (
-      <Card
-        key={item.id}
-        data={item}
-        isFullWidth={true}
-        index={index}
-      />
-    ));
-  };
-
+const ProjectGrid = ({
+  items,
+  categories,
+  activeCategory,
+  onCategoryChange,
+}: {
+  items: Project[];
+  categories: string[];
+  activeCategory: string;
+  onCategoryChange: (value: string) => void;
+}) => {
   return (
-    <>
-      {/* Desktop Grid */}
-      <div className="hidden md:grid grid-cols-2 w-full">
-        {renderDesktopCards()}
+    <div className="mx-auto max-w-7xl px-6 py-20 sm:px-8 lg:px-10">
+      <div className="mb-8 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-sm uppercase tracking-[0.3em] text-white/50">
+            Featured work
+          </p>
+          <h2 className="text-4xl font-light tracking-tight text-white sm:text-5xl">
+            Projects we&apos;re proud of
+          </h2>
+        </div>
+        <div className="flex flex-wrap gap-3">
+          {categories.map((category) => (
+            <button
+              key={category}
+              onClick={() => onCategoryChange(category)}
+              className={`rounded-full border px-4 py-2 text-xs uppercase tracking-[0.3em] transition ${
+                activeCategory === category
+                  ? "border-white bg-white text-black"
+                  : "border-white/30 text-white/70 hover:border-white hover:text-white"
+              }`}
+            >
+              {category}
+            </button>
+          ))}
+        </div>
       </div>
-      
-      {/* Mobile Grid - One card per row */}
-      <div className="md:hidden grid grid-cols-1 w-full">
-        {renderMobileCards()}
+
+      <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 xl:grid-cols-3">
+        {items.map((item, index) => (
+          <Card key={item.id} data={item} index={index} />
+        ))}
       </div>
-    </>
+    </div>
   );
 };
+
+const HomeNav = ({ visible }: { visible?: boolean }) => (
+  <NavBody
+    className="rounded-[40px] border border-white/15 bg-white/[0.04] px-6 py-3 text-white shadow-[0_0_40px_rgba(0,0,0,0.25)] backdrop-blur-xl"
+    visible={visible}
+  >
+    <div className="flex items-center gap-4">
+      <NavbarLogo />
+      {!visible && (
+        <span className="hidden text-[0.65rem] uppercase tracking-[0.4em] text-white/60 md:inline-flex">
+          Interior studio
+        </span>
+      )}
+    </div>
+    <NavItems
+      className="text-[0.65rem] uppercase tracking-[0.4em] text-white/60"
+      items={[
+        { name: "Home", link: "/" },
+        { name: "About", link: "/#about" },
+        { name: "Portfolio", link: "/#portfolio" },
+      ]}
+    />
+    <NavbarButton
+      href="mailto:Sana@thew9y.com"
+      className="rounded-full border-white/50 px-6 py-2 text-[0.65rem] uppercase tracking-[0.4em]"
+    >
+      Start a project
+    </NavbarButton>
+  </NavBody>
+);
 
 export default function Home() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [projects, setProjects] = useState<Project[]>([]);
+  const [categoryFilter, setCategoryFilter] = useState("All");
 
   useEffect(() => {
     // Trigger the loading animation after component mounts
@@ -465,6 +405,19 @@ export default function Home() {
     return () => clearTimeout(timer);
   }, []);
 
+  const categoryOptions = useMemo(() => {
+    const source = projects.length ? projects : fallbackData;
+    const unique = Array.from(new Set(source.map((project) => project.category)));
+    return ["All", ...unique];
+  }, [projects]);
+
+  const filteredProjects = useMemo(() => {
+    if (categoryFilter === "All") {
+      return projects;
+    }
+    return projects.filter((project) => project.category === categoryFilter);
+  }, [projects, categoryFilter]);
+
   return (
     <motion.div
       className="min-h-screen"
@@ -477,25 +430,13 @@ export default function Home() {
         duration: 0.6,
       }}
     >
-      {/* Navbar without motion wrapper to preserve scroll animation */}
-      <Navbar>
-        <NavBody>
-          <NavbarLogo />
-          <NavItems
-            items={[
-              { name: "Home", link: "/" },
-              { name: "About", link: "/#about" },
-              { name: "Portfolio", link: "/#portfolio" },
-            ]}
-          />
-          <NavbarButton href="#" variant="secondary">
-            Contact Us
-          </NavbarButton>
-        </NavBody>
+      {/* Navbar */}
+      <Navbar className="top-6">
+        <HomeNav />
       </Navbar>
 
-      <section className="flex flex-col items-center justify-center h-screen overflow-hidden">
-        {/* Background image with zoom animation */}
+      {/* Hero */}
+      <section className="relative isolate flex min-h-screen items-center overflow-hidden bg-[#050505] text-white">
         <motion.div
           className="absolute inset-0"
           initial={{ scale: 1.2 }}
@@ -512,350 +453,336 @@ export default function Home() {
             placeholder="blur"
             blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkrHB0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyDjckkkfxfkBlm9n"
           />
+          <div className="absolute inset-0 bg-gradient-to-br from-black via-black/70 to-black/30" />
         </motion.div>
 
-        {/* Overlay */}
-        <motion.div
-          className="absolute inset-0 bg-black/50"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5, duration: 1 }}
-        />
-
-        {/* Content with delayed animation */}
-        <motion.div
-          className="absolute bottom-8 left-8 flex flex-col items-start"
-          initial={{ opacity: 0, x: -50 }}
-          animate={{ opacity: isLoaded ? 1 : 0, x: isLoaded ? 0 : -50 }}
-          transition={{ delay: 1.2, duration: 0.8, ease: "easeOut" }}
-        >
-          <h1 className="text-5xl text-white mb-4 font-[400] tracking-tight">
-            THE WHOLE 9 YARDS
-          </h1>
-          <p className="text-white text-lg max-w-xl font-[400] tracking-tight">
-              The whole 9 yards is a design studio that creates distinctive interiors that are understated and soulful, weaving together a delicate balance of diverse materials and contemporary design.
-          </p>
-        </motion.div>
+        <div className="relative z-10 w-full">
+          <motion.div
+            className="mx-auto flex max-w-7xl flex-col gap-10 px-6 py-24 sm:px-8 lg:px-10"
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 40 }}
+            transition={{ duration: 0.9, ease: "easeOut" }}
+          >
+            <div className="max-w-3xl space-y-7 rounded-[48px] border border-white/15 bg-black/40 p-10 shadow-[0_20px_80px_rgba(0,0,0,0.4)] backdrop-blur-xl">
+              <p className="text-sm uppercase tracking-[0.4em] text-white/50">
+                The whole 9 yards
+              </p>
+              <h1 className="text-4xl font-light leading-tight sm:text-6xl">
+                Distinctive interiors that feel collected, calm, and deeply
+                personal.
+              </h1>
+              <p className="text-lg text-white/75">
+                A Dubai-based design studio crafting residences, boutique
+                hospitality, and elevated rentals across the UAE, New York, and
+                London.
+              </p>
+              <div className="flex flex-col gap-4 pt-2 sm:flex-row">
+                <Link
+                  href="/#portfolio"
+                  className="inline-flex items-center justify-center rounded-full border border-white px-8 py-3 text-xs font-semibold uppercase tracking-[0.4em] transition hover:bg-white hover:text-black"
+                >
+                  View portfolio
+                </Link>
+                <Link
+                  href="mailto:Sana@thew9y.com"
+                  className="inline-flex items-center justify-center rounded-full border border-white/40 px-8 py-3 text-xs font-semibold uppercase tracking-[0.4em] text-white/80 transition hover:border-white hover:text-white"
+                >
+                  Book a call
+                </Link>
+              </div>
+              <div className="grid gap-6 border-t border-white/10 pt-6 sm:grid-cols-3">
+                {heroHighlights.map((highlight) => (
+                  <div key={highlight.title} className="space-y-1">
+                    <p className="text-[0.65rem] uppercase tracking-[0.4em] text-white/40">
+                      {highlight.tag}
+                    </p>
+                    <p className="text-lg font-semibold">{highlight.title}</p>
+                    <p className="text-sm text-white/70">
+                      {highlight.description}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        </div>
       </section>
 
       {/* About Us & Mission Section */}
       <section
         id="about"
-        className="min-h-screen bg-black text-white py-20 px-8"
+        className="bg-[#050505] text-white px-6 py-24 sm:px-8 lg:px-10"
       >
-        <div className="max-w-7xl mx-auto">
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-            {/* About Us Column */}
-            <div>
-              <motion.h3
-                className="text-2xl md:text-3xl font-bold mb-8 tracking-tight"
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.1 }}
-                viewport={{ once: true }}
-              >
-                ABOUT US
-              </motion.h3>
-              
-              <div className="space-y-6 text-base md:text-lg leading-relaxed font-[400]">
-                <motion.p
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.2 }}
-                  viewport={{ once: true }}
-                >
-                  Here at The Whole Nine Yards we create distinctive interiors that
-                  are understated and soulful, weaving together a delicate balance
-                  of diverse materials and contemporary design. Inspired by the
-                  Japanese philosophy of wabi-sabi, an aesthetic that focuses on
-                  finding the beauty in imperfection, Our Design Studio will create
-                  a bespoke plan to transform your space.
-                </motion.p>
-
-                <motion.p
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.4 }}
-                  viewport={{ once: true }}
-                >
-                  Founded by Sana Malik, who has over ten years of experience as a
-                  designer, The whole nine yards has a personal approach to every
-                  design, and clients will work closely with Sana at all stages.
-                  Building relationships with her clients gives Sana the opportunity
-                  to create designs that are personal, unique and understand the
-                  needs of the client and the space, so that your home tells your
-                  story.
-                </motion.p>
-
-                <motion.p
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.6 }}
-                  viewport={{ once: true }}
-                >
-                  We use many different kinds of materials paired with muted and
-                  desaturated colours to create an organic space that feels calm.
-                  Sana&apos;s designs are eclectic and characterful, preferring to
-                  follow the flow of the space and be guided by her client&apos;s
-                  personal taste. The company leans towards using textiles and
-                  buying furniture that is built to last, as well as reupholstering
-                  existing furniture, sourcing out products unique to the needs of
-                  each specific project.
-                </motion.p>
-
-                <motion.p
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.8 }}
-                  viewport={{ once: true }}
-                >
-                  We also specialize in furnishing holiday rentals where our curated
-                  selection of furniture pieces combines sleek aesthetics with
-                  functionality. From space-saving sofa bed to stylish vanity unit,
-                  each piece is carefully chosen to complement the design while
-                  offering practicality and comfort.
-                </motion.p>
-
-                <motion.p
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 1.0 }}
-                  viewport={{ once: true }}
-                >
-                  Sana&apos;s experience in the industry has given her the
-                  opportunity to build relationships with specialist suppliers that
-                  offer high end craft, from sourcing anything from materials to
-                  bespoke joinery and upholstery.
-                </motion.p>
+        <div className="mx-auto max-w-7xl space-y-16">
+          <div className="grid gap-12 lg:grid-cols-[1.15fr_0.85fr]">
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7 }}
+              viewport={{ once: true }}
+              className="space-y-6"
+            >
+              <p className="text-sm uppercase tracking-[0.3em] text-white/50">
+                About the studio
+              </p>
+              <h3 className="text-4xl font-light leading-tight sm:text-5xl">
+                Understated interiors with soul, crafted with rigor.
+              </h3>
+              <p className="text-lg text-white/70">
+                The Whole 9 Yards designs homes, hospitality concepts, and
+                rentals that feel collected over time. We listen intently, study
+                how you live, and translate that into calm, refined rooms.
+              </p>
+              <p className="text-lg text-white/70">
+                Inspired by wabi-sabi, we balance imperfect textures with
+                tailored detailing so every space is livable, tactile, and
+                deeply personal.
+              </p>
+              <div className="grid grid-cols-2 gap-4 pt-4 md:gap-6">
+                {studioMetrics.map((metric) => (
+                  <div
+                    key={metric.label}
+                    className="rounded-2xl border border-white/10 bg-white/[0.03] p-5"
+                  >
+                    <p className="text-3xl font-light">{metric.value}</p>
+                    <p className="mt-2 text-xs uppercase tracking-[0.3em] text-white/60">
+                      {metric.label}
+                    </p>
+                  </div>
+                ))}
               </div>
-            </div>
-
-            {/* Mission Column */}
-            <div>
-              <motion.h3
-                className="text-2xl md:text-3xl font-bold mb-8 tracking-tight"
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.1 }}
-                viewport={{ once: true }}
-              >
-                OUR MISSION
-              </motion.h3>
-              
-              <div className="space-y-8 text-base md:text-lg leading-relaxed font-[400]">
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.2 }}
-                  viewport={{ once: true }}
-                >
-                  <h4 className="text-xl font-semibold mb-3 text-white/90">Contemporary Elegance</h4>
-                  <p className="text-white/80">
-                    Our design concept revolves around a contemporary aesthetic with elegant touches to create
-                    a sophisticated ambiance. Clean lines, neutral colour palettes, and luxurious
-                    materials are prominently featured throughout every project.
-                  </p>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.4 }}
-                  viewport={{ once: true }}
-                >
-                  <h4 className="text-xl font-semibold mb-3 text-white/90">Maximizing Space</h4>
-                  <p className="text-white/80">
-                    We believe that every space has its own unique potential. Our
-                    team is passionate about transforming homes and businesses by making the
-                    most out of every inch. Whether it&apos;s a cozy apartment or a bustling office, we take
-                    pride in designing environments that reflect your style while maximizing
-                    usability.
-                  </p>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.6 }}
-                  viewport={{ once: true }}
-                >
-                  <h4 className="text-xl font-semibold mb-3 text-white/90">Premium Finishes</h4>
-                  <p className="text-white/80">
-                    Quality is paramount in our design approach. We use premium
-                    finishes and materials to ensure durability, longevity, and a luxurious feel.
-                    From high-end furniture options to custom tv panels every detail exudes
-                    quality and craftsmanship.
-                  </p>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.8 }}
-                  viewport={{ once: true }}
-                >
-                  <h4 className="text-xl font-semibold mb-3 text-white/90">Colour Schemes</h4>
-                  <p className="text-white/80">
-                    We present you with a range of colour schemes to choose from,
-                    ranging from calming neutrals to comforting hues. Each colour scheme will
-                    be thoughtfully curated to enhance the overall aesthetic and mood of the project.
-                  </p>
-                </motion.div>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.1 }}
+              viewport={{ once: true }}
+              className="rounded-[32px] border border-white/10 bg-white/[0.02] p-8 backdrop-blur"
+            >
+              <div className="space-y-6">
+                {aboutHighlights.map((item, index) => (
+                  <div
+                    key={item.title}
+                    className="rounded-3xl border border-white/5 bg-black/40 p-6"
+                  >
+                    <p className="text-xs uppercase tracking-[0.3em] text-white/40">
+                      {String(index + 1).padStart(2, "0")}
+                    </p>
+                    <h4 className="mt-3 text-2xl font-semibold">{item.title}</h4>
+                    <p className="mt-2 text-base text-white/70">
+                      {item.description}
+                    </p>
+                  </div>
+                ))}
               </div>
-            </div>
+            </motion.div>
           </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.1 }}
+            viewport={{ once: true }}
+            className="rounded-[40px] border border-white/10 bg-white/[0.02] p-8 sm:p-10 backdrop-blur"
+          >
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+              <div>
+                <p className="text-sm uppercase tracking-[0.3em] text-white/50">
+                  Our mission
+                </p>
+                <h3 className="text-3xl font-light sm:text-4xl">
+                  Every project balances serenity, function, and craft.
+                </h3>
+              </div>
+              <p className="max-w-xl text-base text-white/70">
+                We develop concepts that respect the architecture, honor your
+                routines, and introduce premium finishes that feel as good as
+                they look.
+              </p>
+            </div>
+            <div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+              {missionPillars.map((pillar) => (
+                <motion.div
+                  key={pillar.title}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6 }}
+                  viewport={{ once: true }}
+                  className="rounded-3xl border border-white/10 bg-black/40 p-6"
+                >
+                  <span className="text-xs uppercase tracking-[0.3em] text-white/40">
+                    {pillar.focus}
+                  </span>
+                  <h4 className="mt-4 text-xl font-semibold">
+                    {pillar.title}
+                  </h4>
+                  <p className="mt-3 text-sm text-white/70">
+                    {pillar.description}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
         </div>
       </section>
 
       {/* Projects Grid Section */}
-      <section id="portfolio" className="min-h-screen bg-black text-white">
-        <ProjectGrid items={projects} />
+      <section id="portfolio" className="min-h-screen bg-[#050505] text-white">
+        <ProjectGrid
+          items={filteredProjects}
+          categories={categoryOptions}
+          activeCategory={categoryFilter}
+          onCategoryChange={setCategoryFilter}
+        />
       </section>
 
       {/* Footer */}
-      <footer className="bg-black text-white py-16 px-8 border-t border-white/10">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            {/* Company Info */}
+      <footer className="border-t border-white/10 bg-black text-white">
+        <div className="mx-auto max-w-7xl px-6 py-20 sm:px-8 lg:px-10 space-y-14">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
+            viewport={{ once: true }}
+            className="flex flex-col gap-6 rounded-[32px] border border-white/10 bg-white/[0.02] p-8 text-center md:flex-row md:items-center md:justify-between md:text-left"
+          >
+            <div>
+              <p className="text-sm uppercase tracking-[0.3em] text-white/50">
+                Start a conversation
+              </p>
+              <h3 className="mt-3 text-3xl font-light sm:text-4xl">
+                Ready for a thoughtful redesign?
+              </h3>
+              <p className="mt-2 text-base text-white/70">
+                We take on a limited number of projects each quarter to ensure a
+                tailored experience from concept to install.
+              </p>
+            </div>
+            <div className="flex flex-col gap-4 md:flex-row">
+              <Link
+                href="mailto:Sana@thew9y.com"
+                className="inline-flex items-center justify-center rounded-full border border-white px-6 py-3 text-sm font-semibold uppercase tracking-[0.3em] transition hover:bg-white hover:text-black"
+              >
+                Email the studio
+              </Link>
+              <Link
+                href="tel:+971501562323"
+                className="inline-flex items-center justify-center rounded-full border border-white/30 px-6 py-3 text-sm font-semibold uppercase tracking-[0.3em] text-white/80 transition hover:border-white hover:text-white"
+              >
+                Call +971 50 156 2323
+              </Link>
+            </div>
+          </motion.div>
+
+          <div className="grid gap-12 md:grid-cols-3">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
               viewport={{ once: true }}
+              className="space-y-4"
             >
-              <h3 className="text-2xl font-bold mb-6 tracking-tight">
+              <h4 className="text-2xl font-bold tracking-tight">
                 THE WHOLE 9 YARDS
-              </h3>
-              <p className="text-white/80 leading-relaxed mb-4">
-                Creating distinctive interiors that are understated and soulful,
-                weaving together a delicate balance of diverse materials and
-                contemporary design.
+              </h4>
+              <p className="text-white/75">
+                A Dubai-based studio designing soulful interiors across the UAE,
+                New York, and London.
               </p>
-              <p className="text-white/60 text-sm">Founded by Sana Malik</p>
+              <p className="text-sm text-white/50">Founded by Sana Malik</p>
             </motion.div>
 
-            {/* Quick Links */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              viewport={{ once: true }}
+              className="space-y-4"
+            >
+              <h5 className="text-sm uppercase tracking-[0.3em] text-white/50">
+                Explore
+              </h5>
+              <ul className="space-y-2 text-white/80">
+                <li>
+                  <a href="/" className="hover:text-white">
+                    Home
+                  </a>
+                </li>
+                <li>
+                  <a href="/#about" className="hover:text-white">
+                    About
+                  </a>
+                </li>
+                <li>
+                  <a href="/#portfolio" className="hover:text-white">
+                    Portfolio
+                  </a>
+                </li>
+                <li>
+                  <a href="/portfolio-manager" className="hover:text-white">
+                    Portfolio manager
+                  </a>
+                </li>
+              </ul>
+            </motion.div>
+
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
               viewport={{ once: true }}
+              className="space-y-4"
             >
-              <h4 className="text-lg font-bold mb-6 tracking-tight">
-                QUICK LINKS
-              </h4>
-              <ul className="space-y-3">
-                <li>
-                  <a
-                    href="#"
-                    className="text-white/80 hover:text-white transition-colors duration-200"
-                  >
-                    Home
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-white/80 hover:text-white transition-colors duration-200"
-                  >
-                    About Us
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-white/80 hover:text-white transition-colors duration-200"
-                  >
-                    Portfolio
-                  </a>
-                </li>
-                {/* <li>
-                  <a href="#" className="text-white/80 hover:text-white transition-colors duration-200">
-                    Services
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-white/80 hover:text-white transition-colors duration-200">
-                    Contact
-                  </a>
-                </li> */}
-              </ul>
-            </motion.div>
-
-            {/* Contact Info */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              viewport={{ once: true }}
-            >
-              <h4 className="text-lg font-bold mb-6 tracking-tight">
-                GET IN TOUCH
-              </h4>
-              <div className="space-y-4">
+              <h5 className="text-sm uppercase tracking-[0.3em] text-white/50">
+                Visit / follow
+              </h5>
+              <div className="space-y-4 text-white/80">
                 <div>
-                  <p className="text-white/60 text-sm mb-1">Email</p>
+                  <p className="text-xs uppercase tracking-[0.3em] text-white/40">
+                    Email
+                  </p>
                   <a
                     href="mailto:Sana@thew9y.com"
-                    className="text-white/80 hover:text-white transition-colors duration-200"
+                    className="text-lg hover:text-white"
                   >
                     Sana@thew9y.com
                   </a>
                 </div>
                 <div>
-                  <p className="text-white/60 text-sm mb-1">Phone</p>
-                  <a
-                    href="tel:+971501562323"
-                    className="text-white/80 hover:text-white transition-colors duration-200"
-                  >
+                  <p className="text-xs uppercase tracking-[0.3em] text-white/40">
+                    Phone
+                  </p>
+                  <a href="tel:+971501562323" className="text-lg hover:text-white">
                     +971 50 156 2323
                   </a>
                 </div>
-                <div>
-                  <p className="text-white/60 text-sm mb-1">Follow Us</p>
-                  <div className="flex space-x-4 mt-2">
-                    <a
-                      href="https://www.instagram.com/thewhole9yards.ae/"
-                      target="_blank"
-                      className="text-white/60 hover:text-white transition-colors duration-200"
-                    >
-                      Instagram
-                    </a>
-                    {/* <a href="#" className="text-white/60 hover:text-white transition-colors duration-200">
-                      LinkedIn
-                    </a>
-                    <a href="#" className="text-white/60 hover:text-white transition-colors duration-200">
-                      Pinterest
-                    </a> */}
-                  </div>
+                <div className="flex items-center gap-4">
+                  <a
+                    href="https://www.instagram.com/thewhole9yards.ae/"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-sm uppercase tracking-[0.3em] text-white/70 hover:text-white"
+                  >
+                    Instagram
+                  </a>
                 </div>
               </div>
             </motion.div>
           </div>
 
-          {/* Bottom Bar */}
           <motion.div
-            className="border-t border-white/10 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
             viewport={{ once: true }}
+            className="flex flex-col gap-4 border-t border-white/10 pt-6 text-sm text-white/60 md:flex-row md:items-center md:justify-between"
           >
-            <p className="text-white/60 text-sm mb-4 md:mb-0">
-              © 2024 The Whole 9 Yards. All rights reserved.
-            </p>
-            <div className="flex space-x-6">
-              <a
-                href="#"
-                className="text-white/60 hover:text-white text-sm transition-colors duration-200"
-              >
+            <p>© {new Date().getFullYear()} The Whole 9 Yards. All rights reserved.</p>
+            <div className="flex gap-6">
+              <a href="#" className="hover:text-white">
                 Privacy Policy
               </a>
-              <a
-                href="#"
-                className="text-white/60 hover:text-white text-sm transition-colors duration-200"
-              >
+              <a href="#" className="hover:text-white">
                 Terms of Service
               </a>
             </div>

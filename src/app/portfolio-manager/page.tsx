@@ -6,6 +6,8 @@ import { DatabaseService } from "@/lib/database";
 import { upload } from '@vercel/blob/client';
 import imageCompression from 'browser-image-compression';
 import Link from "next/link";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,6 +29,7 @@ interface Project {
 const CATEGORIES = ["Residential", "Commercial", "Holiday Homes"] as const;
 
 export default function PortfolioManager() {
+  const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -310,10 +313,9 @@ export default function PortfolioManager() {
 
   const handleProjectClick = (projectId: string) => {
     setClickedProjectId(projectId);
-    // Wait for animation to complete before navigating
     setTimeout(() => {
-      window.location.href = `/portfolio/${projectId}`;
-    }, 300);
+      router.push(`/project/${projectId}`);
+    }, 250);
   };
 
   // Get unique types from all projects
@@ -359,21 +361,70 @@ export default function PortfolioManager() {
 
   const filteredProjects = getFilteredAndSortedProjects();
 
+  const totalProjects = projects.length;
+  const countByCategory = (category: Project["category"]) =>
+    projects.filter((project) => project.category === category).length;
+  const residentialCount = countByCategory("Residential");
+  const commercialCount = countByCategory("Commercial");
+  const averageGallerySize =
+    totalProjects === 0
+      ? 0
+      : Math.round(
+          projects.reduce(
+            (acc, project) => acc + (project.pictures?.length || 0),
+            0,
+          ) / totalProjects,
+        );
+
+  const percentage = (count: number) =>
+    totalProjects === 0 ? "0%" : `${Math.round((count / totalProjects) * 100)}%`;
+
+  const managerStats = [
+    { label: "Total projects", value: totalProjects.toString().padStart(2, "0") },
+    { label: "Residential share", value: percentage(residentialCount) },
+    {
+      label: "Commercial share",
+      value: percentage(commercialCount),
+    },
+    {
+      label: "Avg. gallery size",
+      value: totalProjects === 0 ? "—" : `${averageGallerySize} images`,
+    },
+  ];
+
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-black text-white">
+        <Image
+          src="/bgs/UC_06048.JPG"
+          alt="Studio mood"
+          fill
+          className="object-cover"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-black via-black/80 to-black/40" />
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          className="max-w-md w-full mx-4"
+          transition={{ duration: 0.8 }}
+          className="relative z-10 mx-4 w-full max-w-lg"
         >
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-2xl text-center">Portfolio Manager</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+          <div className="rounded-[40px] border border-white/10 bg-black/50 p-10 shadow-[0_20px_80px_rgba(0,0,0,0.6)] backdrop-blur-xl">
+            <p className="text-sm uppercase tracking-[0.4em] text-white/50">
+              Secure access
+            </p>
+            <h1 className="mt-4 text-3xl font-light leading-tight">
+              Portfolio manager
+            </h1>
+            <p className="mt-2 text-white/70">
+              Enter your studio passphrase to edit projects, upload galleries, and
+              publish new work.
+            </p>
+            <div className="mt-8 space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password" className="text-white/80">
+                  Password
+                </Label>
                 <div className="relative">
                   <Input
                     id="password"
@@ -381,162 +432,179 @@ export default function PortfolioManager() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter password"
-                    onKeyPress={(e) => e.key === "Enter" && handleLogin()}
-                    className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-400"
+                    onKeyDown={(e) => e.key === "Enter" && handleLogin()}
+                    className="border-white/20 bg-white/5 text-white placeholder:text-white/40 focus:border-white focus:ring-white/40"
                   />
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-0 top-0 h-full cursor-pointer text-white hover:text-gray-300"
+                    className="absolute right-2 top-1/2 h-9 w-9 -translate-y-1/2 rounded-full border border-white/20 bg-white/5 text-white hover:bg-white/10"
                   >
-                    {showPassword ? <IconEyeOff size={20} /> : <IconEye size={20} />}
+                    {showPassword ? <IconEyeOff size={18} /> : <IconEye size={18} />}
                   </Button>
                 </div>
               </div>
-                          <Button
-              onClick={handleLogin}
-              className="w-full cursor-pointer bg-white text-black hover:bg-gray-200"
-              size="lg"
-            >
-                Login
+              <Button
+                onClick={handleLogin}
+                className="w-full rounded-full border border-white bg-white text-xs font-semibold uppercase tracking-[0.4em] text-black transition hover:bg-white/90"
+                size="lg"
+              >
+                Enter studio
               </Button>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </motion.div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Back Button - Mobile */}
-        <div className="md:hidden mb-4">
-          <Button asChild variant="secondary" size="sm">
-            <Link href="/" className="flex items-center">
-              <IconHome size={16} />
-              Back to Home
-            </Link>
-          </Button>
-        </div>
+    <div className="relative min-h-screen bg-black text-white">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.12),_transparent_55%)]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black via-black to-black/90" />
+      </div>
+      <div className="relative z-10 mx-auto max-w-7xl px-6 py-16 sm:px-8 lg:px-10">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-3 text-xs uppercase tracking-[0.4em] text-white/60 transition hover:text-white"
+        >
+          <IconHome size={16} />
+          Back to site
+        </Link>
 
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-8 space-y-4 md:space-y-0">
-          <div className="flex flex-col md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-4">
-            {/* Back Button - Desktop */}
-            <div className="hidden md:block mt-2">
-              <Button asChild variant="secondary">
-                <Link href="/" className="flex items-center">
-                  <IconHome size={20} />
-                  Back to Home
-                </Link>
+        <section className="mt-8 rounded-[48px] border border-white/10 bg-white/[0.02] p-10 shadow-[0_20px_80px_rgba(0,0,0,0.45)] backdrop-blur-xl">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+            <div className="space-y-4">
+              <p className="text-sm uppercase tracking-[0.4em] text-white/50">
+                Internal tools
+              </p>
+              <h1 className="text-4xl font-light leading-tight sm:text-5xl">
+                Curate, edit, and publish the studio portfolio with intent.
+              </h1>
+              <p className="max-w-2xl text-base text-white/70">
+                Upload new case studies, tune categories, and keep every project
+                aligned with the aesthetic clients experience on the site.
+              </p>
+            </div>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <Button
+                onClick={() => setIsAddingProject(true)}
+                className="inline-flex items-center justify-center gap-2 rounded-full border border-white/40 bg-white/[0.06] px-6 py-3 text-xs font-semibold uppercase tracking-[0.4em] text-white transition hover:bg-white/[0.15] hover:text-white"
+                variant="ghost"
+              >
+                <IconPlus size={18} />
+                Add project
+              </Button>
+              <Button
+                onClick={handleLogout}
+                className="inline-flex items-center justify-center gap-2 rounded-full border border-white/30 px-6 py-3 text-xs font-semibold uppercase tracking-[0.4em] text-white/80 transition hover:border-white hover:text-white"
+                variant="ghost"
+              >
+                Logout
               </Button>
             </div>
-            <h1 className="text-3xl font-bold text-white">Portfolio Manager</h1>
           </div>
-          <div className="flex space-x-4">
-            <Button
-              onClick={() => setIsAddingProject(true)}
-              variant="default"
-              className="cursor-pointer"
-            >
-              <IconPlus size={20} />
-              Add Project
-            </Button>
-            <Button
-              onClick={handleLogout}
-              variant="destructive"
-              className="cursor-pointer"
-            >
-              Logout
-            </Button>
-          </div>
-        </div>
 
-        {/* Filter and View Controls */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-4 md:space-y-0">
-          <div className="flex flex-wrap items-center gap-4">
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {managerStats.map((stat) => (
+              <div
+                key={stat.label}
+                className="rounded-3xl border border-white/10 bg-black/30 p-6"
+              >
+                <p className="text-3xl font-light">{stat.value}</p>
+                <p className="mt-2 text-xs uppercase tracking-[0.4em] text-white/50">
+                  {stat.label}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <div className="mt-12 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex flex-wrap items-center gap-3">
             <Button
               onClick={() => setShowFilters(!showFilters)}
-              variant="outline"
-              className="cursor-pointer bg-gray-800 border-gray-700 text-white hover:bg-gray-700"
+              variant="ghost"
+              className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/[0.04] px-5 py-2 text-xs uppercase tracking-[0.3em] text-white hover:bg-white/10 hover:text-white"
             >
               <IconFilter size={16} />
               Filters
             </Button>
-            
-            {/* View Mode Toggle */}
-            <div className="flex bg-gray-800 rounded-md p-1">
+
+            <div className="flex items-center gap-1 rounded-full border border-white/20 bg-white/[0.04] p-1">
               <Button
                 onClick={() => setViewMode("grid")}
-                variant={viewMode === "grid" ? "default" : "ghost"}
-                size="sm"
-                className="cursor-pointer"
+                size="icon"
+                variant="ghost"
+                className={`h-10 w-10 rounded-full ${viewMode === "grid" ? "bg-white text-black" : "text-white/70 hover:text-white"}`}
               >
                 <IconGrid3x3 size={16} />
               </Button>
               <Button
                 onClick={() => setViewMode("list")}
-                variant={viewMode === "list" ? "default" : "ghost"}
-                size="sm"
-                className="cursor-pointer"
+                size="icon"
+                variant="ghost"
+                className={`h-10 w-10 rounded-full ${viewMode === "list" ? "bg-white text-black" : "text-white/70 hover:text-white"}`}
               >
                 <IconList size={16} />
               </Button>
             </div>
           </div>
 
-          {/* Results Count */}
-          <div className="text-white/70 text-sm">
-            {filteredProjects.length} of {projects.length} projects
+          <div className="text-sm uppercase tracking-[0.3em] text-white/50">
+            {filteredProjects.length} shown · {projects.length} total
           </div>
         </div>
 
-        {/* Filter Panel */}
         {showFilters && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="bg-gray-900 border border-gray-800 rounded-lg p-4 mb-6"
+            className="mt-8 rounded-[32px] border border-white/10 bg-white/[0.02] p-6 backdrop-blur"
           >
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid gap-4 md:grid-cols-4">
               <div className="space-y-2">
-                <Label className="text-white">Category</Label>
+                <Label className="text-white/80">Category</Label>
                 <select
                   value={filterCategory}
                   onChange={(e) => setFilterCategory(e.target.value)}
-                  className="w-full p-2 border border-gray-700 bg-gray-800 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-white"
+                  className="w-full rounded-2xl border border-white/20 bg-white/5 px-4 py-3 text-white focus:border-white focus:outline-none focus:ring-2 focus:ring-white/30"
                 >
                   <option value="All">All Categories</option>
-                  {CATEGORIES.map(cat => (
-                    <option key={cat} value={cat}>{cat}</option>
+                  {CATEGORIES.map((cat) => (
+                    <option key={cat} value={cat}>
+                      {cat}
+                    </option>
                   ))}
                 </select>
               </div>
 
               <div className="space-y-2">
-                <Label className="text-white">Type</Label>
+                <Label className="text-white/80">Type</Label>
                 <select
                   value={filterType}
                   onChange={(e) => setFilterType(e.target.value)}
-                  className="w-full p-2 border border-gray-700 bg-gray-800 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-white"
+                  className="w-full rounded-2xl border border-white/20 bg-white/5 px-4 py-3 text-white focus:border-white focus:outline-none focus:ring-2 focus:ring-white/30"
                 >
                   <option value="All">All Types</option>
-                  {getUniqueTypes().map(type => (
-                    <option key={type} value={type}>{type}</option>
+                  {getUniqueTypes().map((type) => (
+                    <option key={type} value={type}>
+                      {type}
+                    </option>
                   ))}
                 </select>
               </div>
 
               <div className="space-y-2">
-                <Label className="text-white">Sort By</Label>
+                <Label className="text-white/80">Sort By</Label>
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="w-full p-2 border border-gray-700 bg-gray-800 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-white"
+                  className="w-full rounded-2xl border border-white/20 bg-white/5 px-4 py-3 text-white focus:border-white focus:outline-none focus:ring-2 focus:ring-white/30"
                 >
                   <option value="newest">Newest First</option>
                   <option value="oldest">Oldest First</option>
@@ -552,139 +620,190 @@ export default function PortfolioManager() {
                     setFilterType("All");
                     setSortBy("newest");
                   }}
-                  variant="outline"
-                  className="cursor-pointer bg-gray-800 border-gray-700 text-white hover:bg-gray-700"
+                  variant="ghost"
+                  className="w-full rounded-2xl border border-white/20 bg-white/[0.04] px-4 py-3 text-xs uppercase tracking-[0.3em] text-white hover:bg-white/10 hover:text-white"
                 >
-                  Clear Filters
+                  Clear
                 </Button>
               </div>
             </div>
           </motion.div>
         )}
 
-        {/* Projects Display */}
-        {viewMode === "grid" ? (
-          /* Grid View */
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            {filteredProjects.map((project) => (
-              <motion.div
-                key={project.id}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ 
-                  opacity: clickedProjectId === project.id ? 0 : 1, 
-                  scale: clickedProjectId === project.id ? 0.9 : 1,
-                  x: clickedProjectId === project.id ? -100 : 0
-                }}
-                transition={{ duration: 0.3 }}
-              >
-                <Card 
-                  className="overflow-hidden bg-gray-900 border-gray-800 cursor-pointer hover:bg-gray-800 transition-colors"
-                  onClick={() => handleProjectClick(project.id)}
+        <div className="mt-12">
+          {viewMode === "grid" ? (
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {filteredProjects.map((project) => (
+                <motion.div
+                  key={project.id}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{
+                    opacity: clickedProjectId === project.id ? 0 : 1,
+                    scale: clickedProjectId === project.id ? 0.9 : 1,
+                    x: clickedProjectId === project.id ? -100 : 0,
+                  }}
+                  transition={{ duration: 0.3 }}
                 >
-                  <div
-                    className="h-48 bg-cover bg-center bg-gray-200"
-                    style={{ 
-                      backgroundImage: project.thumbnail ? `url(${project.thumbnail})` : 'none'
-                    }}
+                  <Card
+                    className="group flex h-full flex-col overflow-hidden rounded-[32px] border border-white/10 bg-white/[0.03] text-white backdrop-blur transition hover:border-white/30"
+                    onClick={() => handleProjectClick(project.id)}
                   >
-                    {!project.thumbnail && (
-                      <div className="h-full flex items-center justify-center text-gray-500">
-                        No Image
-                      </div>
-                    )}
-                  </div>
-                  <CardHeader>
-                    <CardTitle className="text-white">{project.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-gray-300 text-sm mb-4 line-clamp-2">{project.description}</p>
-                    <div className="text-xs text-gray-400 space-y-1">
-                      <div>Category: {project.category}</div>
-                      <div>Type: {project.type}</div>
-                      <div>Size: {project.size}</div>
-                      <div>Location: {project.location}</div>
-                    </div>
-                  </CardContent>
-                  <CardFooter className="justify-end space-x-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setEditingProject(project);
-                        setFormData(project);
-                      }}
-                      className="text-white hover:text-gray-300 cursor-pointer"
-                    >
-                      <IconEdit size={18} />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteProject(project.id);
-                      }}
-                      className="text-white hover:text-red-400 cursor-pointer"
-                    >
-                      <IconTrash size={18} />
-                    </Button>
-                  </CardFooter>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        ) : (
-          /* List View */
-          <div className="space-y-4 mb-8">
-            {filteredProjects.map((project) => (
-              <motion.div
-                key={project.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ 
-                  opacity: clickedProjectId === project.id ? 0 : 1,
-                  x: clickedProjectId === project.id ? -100 : 0
-                }}
-                transition={{ duration: 0.3 }}
-              >
-                <Card 
-                  className="bg-gray-900 border-gray-800 cursor-pointer hover:bg-gray-800 transition-colors"
-                  onClick={() => handleProjectClick(project.id)}
-                >
-                  <div className="flex flex-col md:flex-row">
-                    <div
-                      className="w-full md:w-48 h-32 bg-cover bg-center bg-gray-200 flex-shrink-0"
-                      style={{ 
-                        backgroundImage: project.thumbnail ? `url(${project.thumbnail})` : 'none'
-                      }}
-                    >
+                    <div className="relative h-56 overflow-hidden">
+                      <div
+                        className="absolute inset-0 bg-black/20"
+                        style={{
+                          backgroundImage: project.thumbnail
+                            ? `url(${project.thumbnail})`
+                            : undefined,
+                          backgroundSize: "cover",
+                          backgroundPosition: "center",
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/50 to-black/80" />
                       {!project.thumbnail && (
-                        <div className="h-full flex items-center justify-center text-gray-500">
-                          No Image
+                        <div className="relative z-10 flex h-full items-center justify-center text-sm uppercase tracking-[0.3em] text-white/60">
+                          No image
                         </div>
                       )}
                     </div>
-                    <div className="flex-1 p-6">
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                          <h3 className="text-xl font-bold text-white mb-2">{project.title}</h3>
-                          <p className="text-gray-300 text-sm mb-4 line-clamp-2">{project.description}</p>
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs text-gray-400">
+                    <CardHeader className="space-y-2">
+                      <CardTitle className="text-2xl font-semibold">
+                        {project.title}
+                      </CardTitle>
+                      <p className="text-sm uppercase tracking-[0.3em] text-white/40">
+                        {project.category}
+                      </p>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <p className="text-sm text-white/70 line-clamp-3">
+                        {project.description}
+                      </p>
+                      <div className="grid grid-cols-2 gap-4 text-xs text-white/60">
+                        <div>
+                          <p className="uppercase tracking-[0.3em] text-[0.6rem]">
+                            Type
+                          </p>
+                          <p className="mt-1 text-white">{project.type}</p>
+                        </div>
+                        <div>
+                          <p className="uppercase tracking-[0.3em] text-[0.6rem]">
+                            Size
+                          </p>
+                          <p className="mt-1 text-white">{project.size}</p>
+                        </div>
+                        <div className="col-span-2">
+                          <p className="uppercase tracking-[0.3em] text-[0.6rem]">
+                            Location
+                          </p>
+                          <p className="mt-1 text-white">{project.location}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                    <CardFooter className="flex items-center justify-end gap-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingProject(project);
+                          setFormData(project);
+                        }}
+                        className="rounded-full border border-white/10 text-white/80 transition hover:border-white hover:text-white"
+                      >
+                        <IconEdit size={18} />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteProject(project.id);
+                        }}
+                        className="rounded-full border border-white/10 text-white/80 transition hover:border-white hover:text-red-400"
+                      >
+                        <IconTrash size={18} />
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {filteredProjects.map((project) => (
+                <motion.div
+                  key={project.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{
+                    opacity: clickedProjectId === project.id ? 0 : 1,
+                    x: clickedProjectId === project.id ? -100 : 0,
+                  }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Card
+                    className="flex flex-col overflow-hidden rounded-[32px] border border-white/10 bg-white/[0.03] text-white backdrop-blur transition hover:border-white/30 md:flex-row"
+                    onClick={() => handleProjectClick(project.id)}
+                  >
+                    <div className="relative h-48 w-full overflow-hidden md:h-auto md:w-56">
+                      <div
+                        className="absolute inset-0 bg-black/20"
+                        style={{
+                          backgroundImage: project.thumbnail
+                            ? `url(${project.thumbnail})`
+                            : undefined,
+                          backgroundSize: "cover",
+                          backgroundPosition: "center",
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-black/70" />
+                      {!project.thumbnail && (
+                        <div className="relative z-10 flex h-full items-center justify-center text-sm uppercase tracking-[0.3em] text-white/60">
+                          No image
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex flex-1 flex-col p-6">
+                      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                        <div>
+                          <p className="text-xs uppercase tracking-[0.3em] text-white/40">
+                            {project.category}
+                          </p>
+                          <h3 className="mt-2 text-2xl font-semibold">
+                            {project.title}
+                          </h3>
+                          <p className="mt-4 text-sm text-white/70 line-clamp-2">
+                            {project.description}
+                          </p>
+                          <div className="mt-6 grid grid-cols-2 gap-4 text-xs text-white/60 md:grid-cols-4">
                             <div>
-                              <span className="font-medium">Category:</span> {project.category}
+                              <p className="uppercase tracking-[0.3em] text-[0.6rem]">
+                                Type
+                              </p>
+                              <p className="mt-1 text-white">{project.type}</p>
                             </div>
                             <div>
-                              <span className="font-medium">Type:</span> {project.type}
+                              <p className="uppercase tracking-[0.3em] text-[0.6rem]">
+                                Size
+                              </p>
+                              <p className="mt-1 text-white">{project.size}</p>
                             </div>
                             <div>
-                              <span className="font-medium">Size:</span> {project.size}
+                              <p className="uppercase tracking-[0.3em] text-[0.6rem]">
+                                Location
+                              </p>
+                              <p className="mt-1 text-white">{project.location}</p>
                             </div>
                             <div>
-                              <span className="font-medium">Location:</span> {project.location}
+                              <p className="uppercase tracking-[0.3em] text-[0.6rem]">
+                                Gallery
+                              </p>
+                              <p className="mt-1 text-white">
+                                {project.pictures?.length || 0} images
+                              </p>
                             </div>
                           </div>
                         </div>
-                        <div className="flex space-x-2 ml-4">
+                        <div className="flex items-start gap-2">
                           <Button
                             variant="ghost"
                             size="icon"
@@ -693,7 +812,7 @@ export default function PortfolioManager() {
                               setEditingProject(project);
                               setFormData(project);
                             }}
-                            className="text-white hover:text-gray-300 cursor-pointer"
+                            className="rounded-full border border-white/10 text-white/80 transition hover:border-white hover:text-white"
                           >
                             <IconEdit size={18} />
                           </Button>
@@ -704,214 +823,268 @@ export default function PortfolioManager() {
                               e.stopPropagation();
                               handleDeleteProject(project.id);
                             }}
-                            className="text-white hover:text-red-400 cursor-pointer"
+                            className="rounded-full border border-white/10 text-white/80 transition hover:border-white hover:text-red-400"
                           >
                             <IconTrash size={18} />
                           </Button>
                         </div>
                       </div>
                     </div>
-                  </div>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        )}
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </div>
 
-        {/* No Results Message */}
         {filteredProjects.length === 0 && (
-          <div className="text-center py-12">
-            <div className="text-gray-400 text-lg mb-2">No projects found</div>
-            <div className="text-gray-500 text-sm">Try adjusting your filters or add a new project</div>
+          <div className="mt-16 text-center text-white/60">
+            <p className="text-lg">No projects match your filters.</p>
+            <p className="text-sm text-white/40">
+              Adjust filters or add a new project to populate this view.
+            </p>
           </div>
         )}
+      </div>
 
-        {/* Add/Edit Project Modal */}
-        {(isAddingProject || editingProject) && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="bg-gray-900 border border-gray-800 rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
-            >
-              <h2 className="text-2xl font-bold mb-6 text-white">
-                {editingProject ? "Edit Project" : "Add New Project"}
-              </h2>
-              
-              <div className="space-y-4">
+      {(isAddingProject || editingProject) && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.92 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="w-full max-w-2xl overflow-y-auto rounded-[32px] border border-white/15 bg-black/80 p-8 text-white shadow-[0_30px_80px_rgba(0,0,0,0.7)]"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs uppercase tracking-[0.3em] text-white/40">
+                  {editingProject ? "Edit project" : "Add new project"}
+                </p>
+                <h2 className="text-3xl font-light">
+                  {editingProject ? editingProject.title : "Project details"}
+                </h2>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => {
+                  setIsAddingProject(false);
+                  setEditingProject(null);
+                  resetForm();
+                }}
+                className="rounded-full border border-white/10 text-white/70 hover:text-white"
+              >
+                <IconX size={18} />
+              </Button>
+            </div>
+
+            <div className="mt-8 space-y-5">
+              <div className="space-y-2">
+                <Label htmlFor="title" className="text-white/80">
+                  Title *
+                </Label>
+                <Input
+                  id="title"
+                  type="text"
+                  value={formData.title || ""}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, title: e.target.value }))
+                  }
+                  className="rounded-2xl border border-white/15 bg-white/5 text-white placeholder:text-white/40 focus:border-white/60 focus:ring-white/30"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="description" className="text-white/80">
+                  Description *
+                </Label>
+                <textarea
+                  id="description"
+                  value={formData.description || ""}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      description: e.target.value,
+                    }))
+                  }
+                  rows={4}
+                  className="w-full rounded-2xl border border-white/15 bg-white/5 p-4 text-white placeholder:text-white/40 focus:border-white/60 focus:ring-white/30"
+                />
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="title" className="text-white">Title *</Label>
+                  <Label htmlFor="category" className="text-white/80">
+                    Category
+                  </Label>
+                  <select
+                    id="category"
+                    value={formData.category || "Residential"}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        category: e.target.value as Project["category"],
+                      }))
+                    }
+                    className="w-full rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-white focus:border-white/60 focus:outline-none focus:ring-2 focus:ring-white/30"
+                  >
+                    {CATEGORIES.map((cat) => (
+                      <option key={cat} value={cat}>
+                        {cat}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="type" className="text-white/80">
+                    Type
+                  </Label>
                   <Input
-                    id="title"
+                    id="type"
                     type="text"
-                    value={formData.title || ""}
-                    onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                    className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-400"
+                    value={formData.type || ""}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, type: e.target.value }))
+                    }
+                    className="rounded-2xl border border-white/15 bg-white/5 text-white placeholder:text-white/40 focus:border-white/60 focus:ring-white/30"
+                  />
+                </div>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="size" className="text-white/80">
+                    Size
+                  </Label>
+                  <Input
+                    id="size"
+                    type="text"
+                    value={formData.size || ""}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, size: e.target.value }))
+                    }
+                    className="rounded-2xl border border-white/15 bg-white/5 text-white placeholder:text-white/40 focus:border-white/60 focus:ring-white/30"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="description" className="text-white">Description *</Label>
-                  <textarea
-                    id="description"
-                    value={formData.description || ""}
-                    onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                    rows={3}
-                    className="w-full p-3 border border-gray-700 bg-gray-800 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-white placeholder:text-gray-400"
+                  <Label htmlFor="location" className="text-white/80">
+                    Location
+                  </Label>
+                  <Input
+                    id="location"
+                    type="text"
+                    value={formData.location || ""}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        location: e.target.value,
+                      }))
+                    }
+                    className="rounded-2xl border border-white/15 bg-white/5 text-white placeholder:text-white/40 focus:border-white/60 focus:ring-white/30"
                   />
                 </div>
+              </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="category" className="text-white">Category</Label>
-                    <select
-                      id="category"
-                      value={formData.category || "Residential"}
-                      onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value as Project["category"] }))}
-                      className="w-full p-3 border border-gray-700 bg-gray-800 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-white"
+              <div className="space-y-2">
+                <Label htmlFor="thumbnail" className="text-white/80">
+                  Thumbnail image
+                </Label>
+                <Input
+                  id="thumbnail"
+                  type="file"
+                  accept="image/jpeg,image/jpg,image/png,image/webp"
+                  onChange={(e) => handleImageUpload(e, "thumbnail")}
+                  disabled={isUploading}
+                  className="rounded-2xl border border-dashed border-white/20 bg-white/5 text-white file:text-white"
+                />
+                {isUploading && (
+                  <div className="flex items-center gap-2 text-sm text-white/70">
+                    <IconUpload className="animate-spin" size={16} />
+                    Uploading…
+                  </div>
+                )}
+                {formData.thumbnail && (
+                  <div className="relative inline-block">
+                    <img
+                      src={formData.thumbnail}
+                      alt="Thumbnail preview"
+                      className="h-24 w-24 rounded-2xl border border-white/15 object-cover"
+                    />
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => removeImage(0, "thumbnail")}
+                      className="absolute -right-2 -top-2 rounded-full border border-white/20 bg-black/60 text-white"
                     >
-                      {CATEGORIES.map(cat => (
-                        <option key={cat} value={cat}>{cat}</option>
-                      ))}
-                    </select>
+                      <IconX size={14} />
+                    </Button>
                   </div>
+                )}
+              </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="type" className="text-white">Type</Label>
-                    <Input
-                      id="type"
-                      type="text"
-                      value={formData.type || ""}
-                      onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value }))}
-                      className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-400"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="size" className="text-white">Size</Label>
-                    <Input
-                      id="size"
-                      type="text"
-                      value={formData.size || ""}
-                      onChange={(e) => setFormData(prev => ({ ...prev, size: e.target.value }))}
-                      className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-400"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="location" className="text-white">Location</Label>
-                    <Input
-                      id="location"
-                      type="text"
-                      value={formData.location || ""}
-                      onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
-                      className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-400"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="thumbnail" className="text-white">Thumbnail Image</Label>
-                  <div className="space-y-2">
-                    <Input
-                      id="thumbnail"
-                      type="file"
-                      accept="image/jpeg,image/jpg,image/png,image/webp"
-                      onChange={(e) => handleImageUpload(e, 'thumbnail')}
-                      disabled={isUploading}
-                      className="bg-gray-800 border-gray-700 text-white file:text-white"
-                    />
-                    {isUploading && (
-                      <div className="flex items-center space-x-2 text-white">
-                        <IconUpload className="animate-spin" size={16} />
-                        <span className="text-sm text-white">Uploading...</span>
-                      </div>
-                    )}
-                    {formData.thumbnail && (
-                      <div className="relative inline-block">
-                        <img 
-                          src={formData.thumbnail} 
-                          alt="Thumbnail preview" 
-                          className="h-20 w-20 object-cover rounded border"
+              <div className="space-y-2">
+                <Label htmlFor="pictures" className="text-white/80">
+                  Gallery images
+                </Label>
+                <Input
+                  id="pictures"
+                  type="file"
+                  accept="image/jpeg,image/jpg,image/png,image/webp"
+                  multiple
+                  onChange={(e) => handleImageUpload(e, "pictures")}
+                  disabled={isUploading}
+                  className="rounded-2xl border border-dashed border-white/20 bg-white/5 text-white file:text-white"
+                />
+                {formData.pictures && formData.pictures.length > 0 && (
+                  <div className="flex flex-wrap gap-3">
+                    {formData.pictures.map((pic, index) => (
+                      <div key={index} className="relative">
+                        <img
+                          src={pic}
+                          alt={`Picture ${index + 1}`}
+                          className="h-20 w-20 rounded-2xl border border-white/20 object-cover"
                         />
                         <Button
-                          variant="destructive"
+                          variant="ghost"
                           size="icon"
-                          onClick={() => removeImage(0, 'thumbnail')}
-                          className="absolute -top-2 -right-2 h-6 w-6 cursor-pointer"
+                          onClick={() => removeImage(index, "pictures")}
+                          className="absolute -right-2 -top-2 rounded-full border border-white/20 bg-black/60 text-white"
                         >
                           <IconX size={12} />
                         </Button>
                       </div>
-                    )}
+                    ))}
                   </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="pictures" className="text-white">Additional Pictures</Label>
-                  <div className="space-y-2">
-                    <Input
-                      id="pictures"
-                      type="file"
-                      accept="image/jpeg,image/jpg,image/png,image/webp"
-                      multiple
-                      onChange={(e) => handleImageUpload(e, 'pictures')}
-                      disabled={isUploading}
-                      className="bg-gray-800 border-gray-700 text-white file:text-white"
-                    />
-                    {formData.pictures && formData.pictures.length > 0 && (
-                      <div className="flex flex-wrap gap-2">
-                        {formData.pictures.map((pic, index) => (
-                          <div key={index} className="relative">
-                            <img 
-                              src={pic} 
-                              alt={`Picture ${index + 1}`} 
-                              className="h-20 w-20 object-cover rounded border"
-                            />
-                            <Button
-                              variant="destructive"
-                              size="icon"
-                              onClick={() => removeImage(index, 'pictures')}
-                              className="absolute -top-2 -right-2 h-6 w-6 cursor-pointer"
-                            >
-                              <IconX size={12} />
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
+                )}
               </div>
+            </div>
 
-              <div className="flex justify-end space-x-4 mt-6 text-white">
-                <Button
-                  variant="ghost"
-                  onClick={() => {
-                    setIsAddingProject(false);
-                    setEditingProject(null);
-                    resetForm();
-                  }}
-                  disabled={isUploading}
-                  className="cursor-pointer"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  variant="default"
-                  className="bg-white text-black hover:bg-gray-200"
-                  onClick={editingProject ? handleEditProject : handleAddProject}
-                  disabled={isUploading}
-                >
-                  {isUploading ? "Uploading..." : editingProject ? "Update" : "Add"} Project
-                </Button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </div>
+            <div className="mt-8 flex justify-end gap-4">
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  setIsAddingProject(false);
+                  setEditingProject(null);
+                  resetForm();
+                }}
+                disabled={isUploading}
+                className="rounded-full border border-white/20 px-6 py-2 text-xs uppercase tracking-[0.3em] text-white/70 hover:text-white"
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="ghost"
+                className="rounded-full border border-white bg-white px-6 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-black hover:bg-white/90"
+                onClick={editingProject ? handleEditProject : handleAddProject}
+                disabled={isUploading}
+              >
+                {isUploading ? "Uploading…" : editingProject ? "Update" : "Add"} project
+              </Button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 } 

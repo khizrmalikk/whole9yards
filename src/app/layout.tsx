@@ -46,7 +46,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={neueHaasDisplay.variable}>
-      <body className="font-sans antialiased bg-black">
+      <body className="font-sans antialiased bg-[#050505]">
         {children}
       </body>
     </html>
