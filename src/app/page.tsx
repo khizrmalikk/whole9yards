@@ -296,7 +296,7 @@ const ProjectGrid = ({
             Featured work
           </p>
           <h2 className="text-4xl font-light tracking-tight text-white sm:text-5xl">
-            Projects we&apos;re proud of
+            Portfolio
           </h2>
         </div>
         <div className="flex flex-wrap gap-3">
@@ -407,7 +407,9 @@ export default function Home() {
 
   const categoryOptions = useMemo(() => {
     const source = projects.length ? projects : fallbackData;
-    const unique = Array.from(new Set(source.map((project) => project.category)));
+    const unique = Array.from(
+      new Set(source.map((project) => project.category))
+    );
     return ["All", ...unique];
   }, [projects]);
 
@@ -468,8 +470,8 @@ export default function Home() {
                 The whole 9 yards
               </p>
               <h1 className="text-4xl font-light leading-tight sm:text-6xl">
-                Distinctive interiors that feel collected, calm, and deeply
-                personal.
+                The studio you turn to when you want unique interiors
+                that feel like quiet luxury
               </h1>
               <p className="text-lg text-white/75">
                 A Dubai-based design studio crafting residences, boutique
@@ -568,7 +570,9 @@ export default function Home() {
                     <p className="text-xs uppercase tracking-[0.3em] text-white/40">
                       {String(index + 1).padStart(2, "0")}
                     </p>
-                    <h4 className="mt-3 text-2xl font-semibold">{item.title}</h4>
+                    <h4 className="mt-3 text-2xl font-semibold">
+                      {item.title}
+                    </h4>
                     <p className="mt-2 text-base text-white/70">
                       {item.description}
                     </p>
@@ -613,9 +617,7 @@ export default function Home() {
                   <span className="text-xs uppercase tracking-[0.3em] text-white/40">
                     {pillar.focus}
                   </span>
-                  <h4 className="mt-4 text-xl font-semibold">
-                    {pillar.title}
-                  </h4>
+                  <h4 className="mt-4 text-xl font-semibold">{pillar.title}</h4>
                   <p className="mt-3 text-sm text-white/70">
                     {pillar.description}
                   </p>
@@ -704,24 +706,24 @@ export default function Home() {
               </h5>
               <ul className="space-y-2 text-white/80">
                 <li>
-                  <a href="/" className="hover:text-white">
+                  <Link href="/" className="hover:text-white">
                     Home
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="/#about" className="hover:text-white">
+                  <Link href="/#about" className="hover:text-white">
                     About
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="/#portfolio" className="hover:text-white">
+                  <Link href="/#portfolio" className="hover:text-white">
                     Portfolio
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="/portfolio-manager" className="hover:text-white">
+                  <Link href="/portfolio-manager" className="hover:text-white">
                     Portfolio manager
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </motion.div>
@@ -752,7 +754,10 @@ export default function Home() {
                   <p className="text-xs uppercase tracking-[0.3em] text-white/40">
                     Phone
                   </p>
-                  <a href="tel:+971501562323" className="text-lg hover:text-white">
+                  <a
+                    href="tel:+971501562323"
+                    className="text-lg hover:text-white"
+                  >
                     +971 50 156 2323
                   </a>
                 </div>
@@ -777,7 +782,10 @@ export default function Home() {
             viewport={{ once: true }}
             className="flex flex-col gap-4 border-t border-white/10 pt-6 text-sm text-white/60 md:flex-row md:items-center md:justify-between"
           >
-            <p>© {new Date().getFullYear()} The Whole 9 Yards. All rights reserved.</p>
+            <p>
+              © {new Date().getFullYear()} The Whole 9 Yards. All rights
+              reserved.
+            </p>
             <div className="flex gap-6">
               <a href="#" className="hover:text-white">
                 Privacy Policy
