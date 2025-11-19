@@ -23,7 +23,7 @@ const fallbackData: Project[] = [
     category: "Commercial",
     type: "Office",
     size: "2,500 sq ft",
-    location: "Downtown Manhattan",
+    location: "Downtown Dubai",
     pictures: ["/bgs/UC_06048.JPG", "/bgs/UC_06123.JPG", "/bgs/UC_05990.JPG"],
     createdAt: new Date(),
   },
@@ -36,7 +36,7 @@ const fallbackData: Project[] = [
     category: "Residential",
     type: "Apartment",
     size: "1,200 sq ft",
-    location: "Brooklyn Heights",
+    location: "Dubai Marina",
     pictures: ["/bgs/UC_06048.JPG", "/bgs/UC_05990.JPG"],
     createdAt: new Date(),
   },
@@ -49,7 +49,7 @@ const fallbackData: Project[] = [
     category: "Commercial",
     type: "Retail",
     size: "800 sq ft",
-    location: "SoHo District",
+    location: "Jumeirah 1",
     pictures: ["/bgs/UC_06123.JPG", "/bgs/UC_06048.JPG"],
     createdAt: new Date(),
   },
@@ -61,7 +61,7 @@ const fallbackData: Project[] = [
   //   category: "Commercial",
   //   type: "Office",
   //   size: "5,000 sq ft",
-  //   location: "Midtown West",
+  //   location: "Business Bay",
   //   pictures: ["/bgs/UC_05990.JPG", "/bgs/UC_06123.JPG", "/bgs/UC_06048.JPG"],
   //   createdAt: new Date(),
   // },
@@ -73,7 +73,7 @@ const fallbackData: Project[] = [
   //   category: "Residential",
   //   type: "Penthouse",
   //   size: "3,200 sq ft",
-  //   location: "Upper East Side",
+  //   location: "Palm Jumeirah",
   //   pictures: ["/bgs/UC_06048.JPG", "/bgs/UC_05990.JPG", "/bgs/UC_06123.JPG"],
   //   createdAt: new Date(),
   // },
@@ -85,7 +85,7 @@ const fallbackData: Project[] = [
   //   category: "Commercial",
   //   type: "Studio",
   //   size: "1,800 sq ft",
-  //   location: "Williamsburg",
+  //   location: "Al Quoz",
   //   pictures: ["/bgs/UC_06123.JPG", "/bgs/UC_06048.JPG", "/bgs/UC_05990.JPG"],
   //   createdAt: new Date(),
   // },
@@ -115,7 +115,7 @@ const heroHighlights = [
 const studioMetrics = [
   { label: "Years crafting interiors", value: "10+" },
   { label: "Completed spaces", value: "120" },
-  { label: "Cities we service", value: "3" },
+  { label: "Boutique builds each year", value: "12" },
   { label: "Custom pieces sourced", value: "350+" },
 ];
 
@@ -475,8 +475,7 @@ export default function Home() {
               </h1>
               <p className="text-lg text-white/75">
                 A Dubai-based design studio crafting residences, boutique
-                hospitality, and elevated rentals across the UAE, New York, and
-                London.
+                hospitality, and elevated rentals across the UAE.
               </p>
               <div className="flex flex-col gap-4 pt-2 sm:flex-row">
                 <Link
@@ -516,7 +515,7 @@ export default function Home() {
         className="bg-[#050505] text-white px-6 py-24 sm:px-8 lg:px-10"
       >
         <div className="mx-auto max-w-7xl space-y-16">
-          <div className="grid gap-12 lg:grid-cols-[1.15fr_0.85fr]">
+          <div className="space-y-12">
             <motion.div
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -554,32 +553,6 @@ export default function Home() {
                 ))}
               </div>
             </motion.div>
-            <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.1 }}
-              viewport={{ once: true }}
-              className="rounded-[32px] border border-white/10 bg-white/[0.02] p-8 backdrop-blur"
-            >
-              <div className="space-y-6">
-                {aboutHighlights.map((item, index) => (
-                  <div
-                    key={item.title}
-                    className="rounded-3xl border border-white/5 bg-black/40 p-6"
-                  >
-                    <p className="text-xs uppercase tracking-[0.3em] text-white/40">
-                      {String(index + 1).padStart(2, "0")}
-                    </p>
-                    <h4 className="mt-3 text-2xl font-semibold">
-                      {item.title}
-                    </h4>
-                    <p className="mt-2 text-base text-white/70">
-                      {item.description}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
           </div>
 
           <motion.div
@@ -589,23 +562,37 @@ export default function Home() {
             viewport={{ once: true }}
             className="rounded-[40px] border border-white/10 bg-white/[0.02] p-8 sm:p-10 backdrop-blur"
           >
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-              <div>
-                <p className="text-sm uppercase tracking-[0.3em] text-white/50">
-                  Our mission
-                </p>
-                <h3 className="text-3xl font-light sm:text-4xl">
-                  Every project balances serenity, function, and craft.
-                </h3>
-              </div>
-              <p className="max-w-xl text-base text-white/70">
-                We develop concepts that respect the architecture, honor your
-                routines, and introduce premium finishes that feel as good as
-                they look.
+            <div className="flex flex-col gap-4">
+              <p className="text-sm uppercase tracking-[0.3em] text-white/50">
+                Our mission
               </p>
+              <h3 className="text-3xl font-light sm:text-4xl">
+                Design that feels honest, crafted, and deeply considered.
+              </h3>
             </div>
-            <div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-              {missionPillars.map((pillar) => (
+            <div className="mt-10 grid gap-6 md:grid-cols-2">
+              {[
+                {
+                  title: "Design That Feels",
+                  description:
+                    "Our design concept revolves around spaces that feel as good as they look. With your inspired aesthetic and our elegant touches, we create a sophisticated ambiance.",
+                },
+                {
+                  title: "Purposeful Design",
+                  description:
+                    "We believe every space has its own unique potential. Our team is passionate about transforming homes and businesses by making the most out of every inch while maintaining harmony and flow.",
+                },
+                {
+                  title: "Craftsmanship & Quality",
+                  description:
+                    "We work with trusted artisans and high-end materials to ensure your space feels elevated and long lasting. Every premium detail exudes durability, longevity, and a quiet luxury.",
+                },
+                {
+                  title: "Carefully Curated",
+                  description:
+                    "We obsess over the details and distinctiveness of it all. From bespoke furnishings to curated art, every finish is sourced to make your home feel singular.",
+                },
+              ].map((pillar) => (
                 <motion.div
                   key={pillar.title}
                   initial={{ opacity: 0, y: 30 }}
@@ -614,10 +601,7 @@ export default function Home() {
                   viewport={{ once: true }}
                   className="rounded-3xl border border-white/10 bg-black/40 p-6"
                 >
-                  <span className="text-xs uppercase tracking-[0.3em] text-white/40">
-                    {pillar.focus}
-                  </span>
-                  <h4 className="mt-4 text-xl font-semibold">{pillar.title}</h4>
+                  <h4 className="text-xl font-semibold">{pillar.title}</h4>
                   <p className="mt-3 text-sm text-white/70">
                     {pillar.description}
                   </p>
@@ -688,8 +672,7 @@ export default function Home() {
                 THE WHOLE 9 YARDS
               </h4>
               <p className="text-white/75">
-                A Dubai-based studio designing soulful interiors across the UAE,
-                New York, and London.
+                A Dubai-based studio designing soulful interiors across the UAE.
               </p>
               <p className="text-sm text-white/50">Founded by Sana Malik</p>
             </motion.div>
